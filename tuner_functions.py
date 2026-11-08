@@ -145,6 +145,28 @@ functions_to_memoize = [
 for func in functions_to_memoize:
     func = functools.cache(func)
 
+def initialize_tensors():
+    t0 = time.time()
+    ONE_HOT_TENSORS = get_all_king_bucketed_psts()
+    t1 = time.time()
+    print(f"Made embeddings in {t1-t0:.2f} seconds")
+
+    t0 = time.time()
+    CONTINUOUS_TENSOR = get_continuous_tensor(CONTINUOUS_FUNCTIONS)
+    t1 = time.time()
+    print(f"Made continuous tensor in {t1-t0:.2f} seconds")
+
+
+    t0 = time.time()
+    RESULTS = get_results()
+    t1 = time.time()
+    print(f"Made results tensor in {t1-t0:.2f} seconds")
+
+    t0 = time.time()
+    PHASES = get_phases()
+    t1 = time.time()
+    print(f"Made phase tensor in {t1-t0:.2f} seconds")
+
 EMBEDDING_DIMS = [128, 128, 128, 128, 128, 128] # I don't remember what this does
 SCALING_TERM = 28 * 400 / 2.1 
 # Yes that should be a 24 instead of 28 and that's on my to do list to change
