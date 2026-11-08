@@ -131,6 +131,7 @@ def get_continuous_tensor(features):
     continuous_tensors = []
     for feature in features:
         tensor = feature.get_diff()
+        tensor = torch.tensor(tensor)
         continuous_tensors.append(tensor)
     result = torch.hstack(continuous_tensors)
     return result
