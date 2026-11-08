@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import ctypes
 from ctypes import POINTER, c_int, c_float
+import functools
 
 ################
 #### Cell 2 ####
@@ -127,14 +128,11 @@ CONTINUOUS_FUNCTIONS = [
 ]
 
 def get_continuous_tensor(features):
-    t0 = time.time()
     continuous_tensors = []
     for feature in features:
         tensor = feature.get_diff()
         continuous_tensors.append(tensor)
     result = torch.hstack(continuous_tensors)
-    t1 = time.time()
-    print(f"Made continuous tensor in {t1-t0:.2f} seconds")
     return result
 
 ################
@@ -145,7 +143,11 @@ ONE_HOT_TENSORS = get_all_king_bucketed_psts()
 t1 = time.time()
 print(f"Made embeddings in {t1-t0:.2f} seconds")
 
+t0 = time.time()
 CONTINUOUS_TENSOR = get_continuous_tensor(CONTINUOUS_FUNCTIONS)
+t1 = time.time()
+print(f"Made continuous tensor in {t1-t0:.2f} seconds")
+
 
 t0 = time.time()
 RESULTS = get_results()
@@ -157,6 +159,16 @@ PHASES = get_phases()
 t1 = time.time()
 print(f"Made phase tensor in {t1-t0:.2f} seconds")
 
+functions_to_memoize = [
+    get_all_psts, # Not used
+    get_all_king_bucketed_psts,
+    get_continuous_tensor,
+    get_results,
+    get_phases,
+]
+for func in functions_to_memoize:
+    func = functools.cache(func)
+
 EMBEDDING_DIMS = [128, 128, 128, 128, 128, 128] # I don't remember what this does
 SCALING_TERM = 28 * 400 / 2.1 
 # Yes that should be a 24 instead of 28 and that's on my to do list to change
@@ -167,7 +179,7 @@ SCALING_TERM = 28 * 400 / 2.1
 class Tuner(nn.Module):
     def __init__(self):
         super(Tuner, self).__init__()
-        self.continuous_layer = nn.Linear(CONTINUOUS_TENSOR.shape[1], 2, bias = False)
+        self.continuous_layer = nn.Linear(get_continuous_tensor().shape[1], 2, bias = False)
         self.embedding_layers = [nn.Embedding(dim + 1, 2, padding_idx = dim) for dim in EMBEDDING_DIMS]
         with torch.no_grad():
             self.continuous_layer.weight.zero_()
@@ -232,8 +244,8 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
     def closure():
         # This is the closure required for LBFGS
         optimizer.zero_grad()
-        y_pred = model(PHASES, CONTINUOUS_TENSOR, ONE_HOT_TENSORS)
-        loss = loss_function(y_pred, RESULTS)
+        y_pred = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+        loss = loss_function(y_pred, get_results())
         loss.backward()
         return loss
     
@@ -245,8 +257,8 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
     # 4. Start the training loop
     for epoch in range(max_epochs):
         # 4A. The actual important training
-        y_pred = model(PHASES, CONTINUOUS_TENSOR, ONE_HOT_TENSORS)
-        loss = loss_function(y_pred, RESULTS)
+        y_pred = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+        loss = loss_function(y_pred, get_results())
         loss.backward()
         if optimizer_str == "lbfgs":
             optimizer.step(closure)
@@ -326,7 +338,7 @@ def print_continuous_weights(model):
 
 # IIRC this function is used to make sure the engine and tuner evals match exactly
 def save_eval_to_file(model, filename):
-    evals = model.forward_as_in_engine(PHASES, CONTINUOUS_TENSOR, ONE_HOT_TENSORS)
+    evals = model.forward_as_in_engine(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
     with open(filename, "w") as file:
         for eval_ in evals:
             file.write(str(int(eval_.item())))
