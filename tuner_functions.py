@@ -14,17 +14,6 @@ import functools
 ################
 NUM_FENS = 7153281
 
-BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1]
-
-NUM_KING_BUCKETS = 2
-
 # Step 1: Load the library
 lib_path = "libamethyst_tuner.dylib"
 libtuner = ctypes.cdll.LoadLibrary(lib_path)
@@ -79,6 +68,17 @@ def get_psts(side, piece):
     psts = psts.reshape(-1,maxPieces)
     psts.sort()
     return torch.tensor(psts)
+
+BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
+                      0, 0, 0, 0, 1, 1, 1, 1,
+                      0, 0, 0, 0, 1, 1, 1, 1,
+                      0, 0, 0, 0, 1, 1, 1, 1,
+                      0, 0, 0, 0, 1, 1, 1, 1,
+                      0, 0, 0, 0, 1, 1, 1, 1,
+                      0, 0, 0, 0, 1, 1, 1, 1,
+                      0, 0, 0, 0, 1, 1, 1, 1]
+
+NUM_KING_BUCKETS = 2
 
 def get_king_bucketed_psts(side, piece):
     psts = get_psts(side, piece)
