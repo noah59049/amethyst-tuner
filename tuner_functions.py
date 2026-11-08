@@ -102,33 +102,53 @@ def get_all_king_bucketed_psts():
 ################
 #### Cell 4 ####    not actually
 ################
-CONTINUOUS_FUNCTION_DICT = {
-    "mobility": get_mobility
-    # 1 for each continuous function that I make
-    # In the future this will have more than just mobility
-}
 
-def get_continuous_tensor(feature_names):
+# This could probably be made into a dataclass
+class ContinuousFeature(object):
+    def __init__(
+        self,
+        name,
+        dims,
+        func
+    ):
+        self.name = name
+        self.dims = dims
+        self.func = func
+
+    def get_diff(self):
+        return self.func(0) - self.func(1)
+
+CONTINUOUS_FUNCTIONS = [
+    ContinuousFeature(
+        "mobility",
+        6,
+        get_mobility
+    )
+]
+
+def get_continuous_tensor(features):
     t0 = time.time()
     continuous_tensors = []
-    for name in feature_names:
-        func = CONTINUOUS_FUNCTION_DICT[name]
-        tensor = func(0) - func(1)
+    for feature in features:
+        tensor = feature.get_diff()
         continuous_tensors.append(tensor)
     result = torch.hstack(continuous_tensors)
     t1 = time.time()
     print(f"Made continuous tensor in {t1-t0:.2f} seconds")
     return result
 
-get_continuous_tensor()
+################
+#### Cell 4 ####    not actually
+################
+
+CONTINUOUS_TENSOR = get_continuous_tensor()
+
 t0 = time.time()
 ONE_HOT_TENSORS = get_all_king_bucketed_psts()
 t1 = time.time()
 print(f"Made embeddings in {t1-t0:.2f} seconds")
 
 CONTINUOUS_TENSOR = get_continuous_tensor()
-CONTINUOUS_FEATURE_NAMES = ["mobility"]
-CONTINUOUS_FEATURE_DIMS = [6]
 EMBEDDING_DIMS = [128, 128, 128, 128, 128, 128] # I don't remember what this does
 
 t0 = time.time()
@@ -296,9 +316,9 @@ def print_continuous_weights(model):
     # Step 1: Continuous weights
     weights_tensor = model.continuous_layer.weight
     index = 0
-    for feature_name, dims in zip(CONTINUOUS_FEATURE_NAMES, CONTINUOUS_FEATURE_DIMS):
-#         feature_name = feature.get_name()
-#         dims = feature.get_n()
+    for feature in CONTINUOUS_FUNCTIONS:
+        feature_name = feature.name
+        dims = feature.dims
         feature_weights = torch.round(weights_tensor[:, index:index+dims])
         str_feature_weights = [f"S{int(feature_weights[0, i]), int(feature_weights[1, i])}" for i in range(feature_weights.shape[1])]
         strw2 = "{" + ", ".join(str_feature_weights) + "}"
