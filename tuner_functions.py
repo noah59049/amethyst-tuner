@@ -263,8 +263,8 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
             print(f"epoch {epoch+1}; loss = {loss.item():.4f}; total time = {int(t1-t0)}")
             
         # 4C. Stopping criteria
-        # If, in the past 10 epochs, none of the params have changed by more than 0.5, we are done.
-        if (epoch % 10 == 9):
+        # If, in the past 10 epochs (or 1 epoch if using LBFGS), none of the params have changed by more than 0.5, we are done.
+        if optimizer_str == "lbfgs" or (epoch % 10 == 9):
             current_params = get_detached_params(model)
             if previous_params is not None:
                 max_delta = get_max_delta(previous_params, current_params)
