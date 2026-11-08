@@ -135,30 +135,6 @@ def get_continuous_tensor(features):
     result = torch.hstack(continuous_tensors)
     return result
 
-################
-#### Cell 4 ####    not actually
-################
-t0 = time.time()
-ONE_HOT_TENSORS = get_all_king_bucketed_psts()
-t1 = time.time()
-print(f"Made embeddings in {t1-t0:.2f} seconds")
-
-t0 = time.time()
-CONTINUOUS_TENSOR = get_continuous_tensor(CONTINUOUS_FUNCTIONS)
-t1 = time.time()
-print(f"Made continuous tensor in {t1-t0:.2f} seconds")
-
-
-t0 = time.time()
-RESULTS = get_results()
-t1 = time.time()
-print(f"Made results tensor in {t1-t0:.2f} seconds")
-
-t0 = time.time()
-PHASES = get_phases()
-t1 = time.time()
-print(f"Made phase tensor in {t1-t0:.2f} seconds")
-
 functions_to_memoize = [
     get_all_psts, # Not used
     get_all_king_bucketed_psts,
