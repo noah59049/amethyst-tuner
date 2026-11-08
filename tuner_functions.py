@@ -325,3 +325,25 @@ def print_continuous_weights(model):
         line = f"constexpr {eval_t_name} {feature_name}[{dims}] = {strw2};"
         print(line)
         index += dims
+
+#####################
+#### Example run ####
+#####################
+"""
+model1 = Tuner()
+with torch.no_grad():
+    for piece in range(6):
+        for phase in range(2):
+            model1.embedding_layers[piece].weight[:,phase] = MATERIAL_START_WEIGHTS[phase,piece]
+            # IMPORTANT: We need to set the weights for the padding index to 0
+            model1.embedding_layers[piece].weight[NUM_KING_BUCKETS * 64] = 0
+
+model2 = get_model(model1, optimizer = "lbfgs", max_epochs = 100) # This apparently got stuck
+
+model3 = get_model(model1, optimizer = "adam") # This took like 3 hours
+
+tuner4 = get_model(optimizer = "lbfgs") # This one doesn't get stuck
+
+print_continuous_weights(model2) # Wait why model2, it got stuck 
+print_king_bucketed_psts(model2.embedding_layers) # why model2 again
+"""
