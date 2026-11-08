@@ -178,7 +178,7 @@ SCALING_TERM = 28 * 400 / 2.1
 class Tuner(nn.Module):
     def __init__(self):
         super(Tuner, self).__init__()
-        self.continuous_layer = nn.Linear(get_continuous_tensor().shape[1], 2, bias = False)
+        self.continuous_layer = nn.Linear(get_continuous_tensor(CONTINUOUS_FUNCTIONS).shape[1], 2, bias = False)
         self.embedding_layers = [nn.Embedding(dim + 1, 2, padding_idx = dim) for dim in EMBEDDING_DIMS]
         with torch.no_grad():
             self.continuous_layer.weight.zero_()
@@ -243,7 +243,7 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
     def closure():
         # This is the closure required for LBFGS
         optimizer.zero_grad()
-        y_pred = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+        y_pred = model(get_phases(), get_continuous_tensor(CONTINUOUS_FUNCTIONS), get_all_king_bucketed_psts())
         loss = loss_function(y_pred, get_results())
         loss.backward()
         return loss
@@ -256,7 +256,7 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
     # 4. Start the training loop
     for epoch in range(max_epochs):
         # 4A. The actual important training
-        y_pred = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+        y_pred = model(get_phases(), get_continuous_tensor(CONTINUOUS_FUNCTIONS), get_all_king_bucketed_psts())
         loss = loss_function(y_pred, get_results())
         loss.backward()
         if optimizer_str == "lbfgs":
@@ -337,7 +337,7 @@ def print_continuous_weights(model):
 
 # IIRC this function is used to make sure the engine and tuner evals match exactly
 def save_eval_to_file(model, filename):
-    evals = model.forward_as_in_engine(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+    evals = model.forward_as_in_engine(get_phases(), get_continuous_tensor(CONTINUOUS_FUNCTIONS), get_all_king_bucketed_psts())
     with open(filename, "w") as file:
         for eval_ in evals:
             file.write(str(int(eval_.item())))
