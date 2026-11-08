@@ -12,7 +12,6 @@ import functools
 ################
 #### Cell 2 ####
 ################
-NUM_FENS = 7153281
 
 # Step 1: Load the library
 lib_path = "libamethyst_tuner.dylib"
@@ -25,6 +24,7 @@ libtuner.getKingSquares.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
 
+NUM_FENS = 7153281
 def get_results():
     results = (c_float * NUM_FENS)()
     libtuner.getResults(results,
