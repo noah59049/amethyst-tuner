@@ -141,14 +141,13 @@ def get_continuous_tensor(features):
 #### Cell 4 ####    not actually
 ################
 
-CONTINUOUS_TENSOR = get_continuous_tensor()
 
 t0 = time.time()
 ONE_HOT_TENSORS = get_all_king_bucketed_psts()
 t1 = time.time()
 print(f"Made embeddings in {t1-t0:.2f} seconds")
 
-CONTINUOUS_TENSOR = get_continuous_tensor()
+CONTINUOUS_TENSOR = get_continuous_tensor(CONTINUOUS_FUNCTIONS)
 EMBEDDING_DIMS = [128, 128, 128, 128, 128, 128] # I don't remember what this does
 
 t0 = time.time()
