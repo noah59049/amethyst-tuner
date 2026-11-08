@@ -11,7 +11,7 @@ from ctypes import POINTER, c_int, c_float
 ################
 #### Cell 2 ####
 ################
-SIZE = 7153281
+NUM_FENS = 7153281
 
 BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
                       0, 0, 0, 0, 1, 1, 1, 1,
@@ -36,45 +36,45 @@ libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
 
 def get_results():
-    results = (c_float * SIZE)()
+    results = (c_float * NUM_FENS)()
     libtuner.getResults(results,
-                       c_int(SIZE))
-    results = np.ctypeslib.as_array(results, shape = (SIZE,))
+                       c_int(NUM_FENS))
+    results = np.ctypeslib.as_array(results, shape = (NUM_FENS,))
     results = torch.tensor(results)
     return results
 
 def get_phases():
-    phases = (c_int * SIZE)()
+    phases = (c_int * NUM_FENS)()
     libtuner.getPhases(phases,
-                       c_int(SIZE))
-    phases = np.ctypeslib.as_array(phases, shape = (SIZE,))
+                       c_int(NUM_FENS))
+    phases = np.ctypeslib.as_array(phases, shape = (NUM_FENS,))
     phases = torch.tensor(phases)
     phases = torch.stack([phases, 24 - phases])
     phases = torch.transpose(phases, 0, 1).float()
     return phases
 
 def get_king_squares(side):
-    kingSquares = (c_int * SIZE)()
-    libtuner.getKingSquares(c_int(side), kingSquares, c_int(SIZE))
-    kingSquares = np.ctypeslib.as_array(kingSquares, shape=(SIZE,))
+    kingSquares = (c_int * NUM_FENS)()
+    libtuner.getKingSquares(c_int(side), kingSquares, c_int(NUM_FENS))
+    kingSquares = np.ctypeslib.as_array(kingSquares, shape=(NUM_FENS,))
     return kingSquares.reshape(-1,1)
     
 def get_mobility(side):
-    mobility = (c_int * (6 * SIZE))()
-    libtuner.getMobility(c_int(side), mobility, c_int(SIZE))
-    mobility = np.ctypeslib.as_array(mobility, shape=(6 * SIZE,))
+    mobility = (c_int * (6 * NUM_FENS))()
+    libtuner.getMobility(c_int(side), mobility, c_int(NUM_FENS))
+    mobility = np.ctypeslib.as_array(mobility, shape=(6 * NUM_FENS,))
     return mobility.reshape(-1,6)
 
 def get_psts(side, piece):
     maxPieces = [8,2,2,2,2,1][piece]
-    psts = (c_int * (maxPieces * SIZE))()
+    psts = (c_int * (maxPieces * NUM_FENS))()
     libtuner.getPSTs(c_int(side),      # side
                      c_int(piece),     # piece
                      c_int(maxPieces), # maxPieces
                      psts,             # arr
-                     c_int(SIZE))      # length
+                     c_int(NUM_FENS))      # length
     
-    psts = np.ctypeslib.as_array(psts, shape = (maxPieces * SIZE,))
+    psts = np.ctypeslib.as_array(psts, shape = (maxPieces * NUM_FENS,))
     psts = psts.reshape(-1,maxPieces)
     psts.sort()
     return torch.tensor(psts)
