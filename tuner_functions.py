@@ -326,6 +326,17 @@ def print_continuous_weights(model):
         print(line)
         index += dims
 
+# IIRC this function is used to make sure the engine and tuner evals match exactly
+def save_eval_to_file(model, filename):
+    evals = model.forward_as_in_engine(PHASES, CONTINUOUS_TENSOR, ONE_HOT_TENSORS)
+    with open(filename, "w") as file:
+        for eval_ in evals:
+            file.write(str(int(eval_.item())))
+            file.write('\n')
+            
+    print(f"len(evals) is {len(evals)}")
+    file.close()
+
 #####################
 #### Example run ####
 #####################
