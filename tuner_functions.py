@@ -1,6 +1,6 @@
-################
-#### Cell 1 ####
-################
+#################
+#### Imports ####
+#################
 import time
 import numpy as np
 import torch
@@ -9,9 +9,9 @@ import ctypes
 from ctypes import POINTER, c_int, c_float
 import functools
 
-################
-#### Cell 2 ####
-################
+##################################
+#### Functions defined in C++ ####
+##################################
 
 # Step 1: Load the library
 lib_path = "libamethyst_tuner.dylib"
@@ -73,6 +73,10 @@ def get_psts(side, piece):
     psts.sort()
     return torch.tensor(psts)
 
+############################
+#### King bucketed PSTs ####
+############################
+
 BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
                       0, 0, 0, 0, 1, 1, 1, 1,
                       0, 0, 0, 0, 1, 1, 1, 1,
@@ -96,17 +100,14 @@ def get_king_bucketed_psts(side, piece):
     psts = torch.minimum(psts, cap)
     return psts
 
-################
-#### Cell 3 ####
-################
 def get_all_psts():
     return [torch.stack([get_psts(0,piece), get_psts(1, piece)]) for piece in range(6)]
 def get_all_king_bucketed_psts():
     return [torch.stack([get_king_bucketed_psts(0,piece), get_king_bucketed_psts(1, piece)]) for piece in range(6)]
 
-################
-#### Cell 4 ####    not actually
-################
+###############################################
+#### Making the continuous features tensor ####
+###############################################
 
 # This could probably be made into a dataclass
 class ContinuousFeature(object):
@@ -140,6 +141,10 @@ def get_continuous_tensor(features):
     result = torch.hstack(continuous_tensors)
     return result
 
+###################################################
+#### Memoization and initialization of tensors ####
+###################################################
+
 functions_to_memoize = [
     get_all_psts, # Not used
     get_all_king_bucketed_psts,
@@ -171,6 +176,10 @@ def initialize_tensors():
     PHASES = get_phases()
     t1 = time.time()
     print(f"Made phase tensor in {t1-t0:.2f} seconds")
+
+#########################################
+#### Tuner class, defining the model ####
+#########################################
 
 EMBEDDING_DIMS = [128, 128, 128, 128, 128, 128] # I don't remember what this does
 SCALING_TERM = 28 * 400 / 2.1 
@@ -215,6 +224,10 @@ class Tuner(nn.Module):
             self.continuous_layer.weight.round_()
             for layer in self.embedding_layers:
                 layer.weight.round_()
+
+##########################
+#### Training process ####
+##########################
 
 def get_detached_params(model):
     return [param.detach().clone() for param in model.parameters()]
@@ -288,6 +301,10 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
 
     model.round_weights()
     return model
+
+#########################################
+#### Printing weights, saving evals  ####
+#########################################
 
 def print_psts(params):
     print("constexpr std::array<std::array<packed_eval_t, 64>, 6> psts = {{")
