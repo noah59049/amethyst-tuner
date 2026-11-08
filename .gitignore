@@ -1,0 +1,4 @@
+.ipynb_checkpoints
+*.epd
+*.dylib
+.DS_Store
