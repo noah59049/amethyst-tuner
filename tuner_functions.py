@@ -325,6 +325,7 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
         message = f"epoch {epoch}; t={int(t1-t0)}; loss={loss.item():.4f}"
         if check_max_delta:
             message += f"; max(∆w) = {max_delta:.4f}"
+        print(message)
             
         # 4C. Stopping criteria
         # If none of the params have changed more than 0.5 since last time we checked, we break out of the loop.
