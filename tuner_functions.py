@@ -58,6 +58,7 @@ def get_mobility(side):
     libtuner.getMobility(c_int(side), mobility, c_int(FENS_TO_KEEP))
     mobility = np.ctypeslib.as_array(mobility, shape=(6 * FENS_TO_KEEP,))
     return mobility.reshape(-1,6)
+    # We will convert to torch tensor and to float when we stack all the tensors together
 
 def get_psts(side, piece):
     maxPieces = [8,2,2,2,2,1][piece]
@@ -132,13 +133,14 @@ CONTINUOUS_FUNCTIONS = [
     )
 ]
 
-def get_continuous_tensor(features):
+def get_continuous_tensor(features: list[ContinuousFeature]):
     continuous_tensors = []
     for feature in features:
         tensor = feature.get_diff()
         tensor = torch.tensor(tensor)
         continuous_tensors.append(tensor)
     result = torch.hstack(continuous_tensors)
+    result = result.float()
     return result
 
 ###################################################
