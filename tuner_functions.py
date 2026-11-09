@@ -420,6 +420,10 @@ def print_tensor_dtypes():
     print(f"Results tensor dtype: {get_results().dtype}")
     print(f"Phases tensor dtype: {get_phases().dtype}")
 
+# TODO: Make a model and print out its weights
+# TODO: Print out a model's weights after one epoch
+# TODO: Print out a model's intermediate state
+
 #####################
 #### Example run ####
 #####################
