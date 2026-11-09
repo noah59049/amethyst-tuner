@@ -422,15 +422,15 @@ def print_tensor_dtypes():
     print(f"Phases tensor dtype: {get_phases().dtype}")
 
 def adam_determinism_test():
-    model1 = get_model(max_epochs=8, optimizer = "adam")
-    model2 = get_model(max_epochs=8, optimizer = "adam")
+    model1 = get_model(max_epochs=800, optimizer = "adam")
+    model2 = get_model(max_epochs=800, optimizer = "adam")
     deterministic = model1.get_hash() == model2.get_hash()
     print("Adam is deterministic") if deterministic else ("Adam is not deterministic")
     return deterministic
 
 def lbfgs_determinism_test():
-    model1 = get_model(max_epochs=1, optimizer = "lbfgs")
-    model2 = get_model(max_epochs=1, optimizer = "lbfgs")
+    model1 = get_model(max_epochs=100, optimizer = "lbfgs")
+    model2 = get_model(max_epochs=100, optimizer = "lbfgs")
     deterministic = model1.get_hash() == model2.get_hash()
     print("LBFGS is deterministic") if deterministic else ("LBFGS is not deterministic")
     return deterministic
@@ -441,6 +441,9 @@ def lbfgs_determinism_test():
 # TODO: Various determinism tests
 
 if __name__ == "__main__":
+    print("----------------------------")
+    print("--- Tuner test functions ---")
+    print("----------------------------")
     initialize_tensors()
     print_tensor_shapes()
     print_tensor_dtypes()
