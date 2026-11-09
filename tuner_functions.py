@@ -320,6 +320,7 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
 #### Printing weights, saving evals  ####
 #########################################
 
+# I could indent these, but why bother
 def print_psts(params):
     print("constexpr std::array<std::array<packed_eval_t, 64>, 6> psts = {{")
     for piece_type in range(6):
@@ -337,12 +338,12 @@ def print_psts(params):
     print("}};")
 
 def print_king_bucketed_psts(params):
-    print(f"constexpr std::array<std::array<std::array<packed_eval_t, 64>, 6>, {NUM_KING_BUCKETS}> psts = " + "{{")
+    print(f"    constexpr std::array<std::array<std::array<packed_eval_t, 64>, 6>, {NUM_KING_BUCKETS}> psts = " + "{{")
     for bucket in range(NUM_KING_BUCKETS):
         idx = bucket * 64
-        print("{{")
+        print(" " * 10 + "{{")
         for piece_type in range(6):
-            print("{")
+            print(" " * 19 + "{")
 
             # Determine how much whitespace we need
             l1 = len(str(torch.min(params[piece_type].weight.data.int()).item()))
@@ -350,10 +351,10 @@ def print_king_bucketed_psts(params):
             l = max(l1, l2)
 
             for i, thing in enumerate(params[piece_type].weight.data.int()[idx:idx+64,:]):
-                print(f"S({thing[0]:{l}},{thing[1]:{l}}), ", end = "\n" * (i % 8 - 6))
-            print("},")
-        print("}},")
-    print("}};")
+                print(f"{" " * 23}S({thing[0]:{l}},{thing[1]:{l}}), ", end = "\n" * (i % 8 - 6))
+            print(" " * 19 + "{")
+        print(" " * 10 + "}},")
+    print(" " * 8 + "}};")
 
 eval_t_name = "packed_eval_t"
 def print_continuous_weights(model):
