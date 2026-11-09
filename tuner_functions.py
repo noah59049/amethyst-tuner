@@ -181,7 +181,11 @@ def initialize_tensors():
 #### Tuner class, defining the model ####
 #########################################
 
-EMBEDDING_DIMS = [128, 128, 128, 128, 128, 128] # I don't remember what this does
+EMBEDDING_DIMS = [128, 128, 128, 128, 128, 128]
+# EMBEDDING_DIMS is how high the numbers in each embedding go
+# And how big to make the nn.Embedding corresponding to it
+# So if EMBEDDING_DIMS[0] is 64, a Tuner will have its first embedding layer be a nn.Embedding(65, 2, padding_idx = 64)
+
 SCALING_TERM = 28 * 400 / 2.1 
 # Yes that should be a 24 instead of 28 and that's on my to do list to change
 # Unfortunately it's not as simple as "just change it"
