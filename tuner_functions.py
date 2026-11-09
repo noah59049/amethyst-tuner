@@ -202,6 +202,7 @@ class Tuner(nn.Module):
         super(Tuner, self).__init__()
         self.continuous_layer = nn.Linear(get_continuous_tensor().shape[1], 2, bias = False)
         self.embedding_layers = [nn.Embedding(dim + 1, 2, padding_idx = dim) for dim in EMBEDDING_DIMS]
+        # TODO: Turn this into a nn.ModuleList or something
         with torch.no_grad():
             self.continuous_layer.weight.zero_()
             for i, layer in enumerate(self.embedding_layers):
