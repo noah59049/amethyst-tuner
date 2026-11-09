@@ -26,7 +26,7 @@ libtuner.getKingSquares.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
 
-FENS_TO_KEEP = 10000
+FENS_TO_KEEP = 7153281
 # Max possible value for FENS_TO_KEEP is 7153281 for Noah.epd
 # Higher values will give an error because we don't have enough fens
 # Set to something like 100000 for debugging purposes
