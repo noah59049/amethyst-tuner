@@ -274,12 +274,12 @@ def get_max_delta(params1, params2):
 
 def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
     # 1. Random stuff we need
+    t0 = time.time()
     if model is None:
         model = Tuner()
-    t0 = time.time()
     optimizer_str = optimizer
     
-    # 2. The actual stuff needed for training
+    # 2. Optimizer, loss function, closure for LBFGS
     loss_function = nn.BCELoss()
     if optimizer_str == "lbfgs":
         optimizer = torch.optim.LBFGS(model.parameters())
@@ -298,12 +298,13 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
     
     # 3. Stopping criteria
     STOPPING_DELTA = 0.5
-    previous_params = None
-    current_params = None
+    previous_params = get_detached_params(model)
+    current_params = get_detached_params(model)
+    max_delta = torch.inf
     
     # 4. Start the training loop
-    for epoch in range(max_epochs):
-        # 4A. The actual important training
+    for epoch in range(1, max_epochs + 1):
+        # 4A. Forward pass, loss, backpropagation
         y_pred = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
         loss = loss_function(y_pred, get_results())
         loss.backward()
@@ -315,20 +316,21 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
 
         # 4B. Printouts
         t1 = time.time()
-        if True:
-            print(f"epoch {epoch+1}; loss = {loss.item():.4f}; total time = {int(t1-t0)}")
+        check_max_delta = optimizer_str == "lbfgs" or (epoch % 10 == 9)
+        if check_max_delta:
+            current_params = get_detached_params(model)
+            max_delta = get_max_delta(previous_params, current_params)
+            previous_params = current_params
+
+        message = f"epoch {epoch}; t={int(t1-t0)}; loss={loss.item():.4f}"
+        if check_max_delta:
+            message += f"; max(∆w) = {max_delta:.4f}"
             
         # 4C. Stopping criteria
-        # If, in the past 10 epochs (or 1 epoch if using LBFGS), none of the params have changed by more than 0.5, we are done.
-        if optimizer_str == "lbfgs" or (epoch % 10 == 9):
-            current_params = get_detached_params(model)
-            if previous_params is not None:
-                max_delta = get_max_delta(previous_params, current_params)
-                print(f"Max parameter weight change is {max_delta:.4f}")
-                if max_delta < STOPPING_DELTA:
-                    break
+        # If none of the params have changed more than 0.5 since last time we checked, we break out of the loop.
+        if max_delta < STOPPING_DELTA:
+            break
 
-            previous_params = current_params
 
     model.round_weights()
     return model
