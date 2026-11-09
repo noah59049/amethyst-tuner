@@ -8,6 +8,8 @@ import torch.nn as nn
 import ctypes
 from ctypes import POINTER, c_int, c_float
 import functools
+import io
+import hashlib
 
 ##################################
 #### Functions defined in C++ ####
@@ -244,11 +246,15 @@ class Tuner(nn.Module):
 
     def get_hash(self):
         # NOTE: This gives a different result depending on if you round weights first or not!
-        hashes = []
-        hashes.append(torch.hash_tensor(self.continuous_layer.weight))
+        # Method adapted from https://stackoverflow.com/questions/63880081/how-to-convert-a-torch-tensor-into-a-byte-string
+        buff = io.BytesIO()
+        torch.save(self.continuous_layer.weight, buff)
         for emb in self.embedding_layers:
-            hashes.append(torch.hash_tensor(emb.weight))
-        return torch.hash_tensor(torch.tensor(hashes)).item()
+            torch.save(emb.weight, buff)
+        buff.seek(0)
+        b = buff.read() # This is a bytes object
+        return hashlib.sha256(b).hexdigest() # This is a 64 character long hex string
+        # sha256 is slightly overkill, but it doesn't really matter. This function runs in no time anyway.
 
 ##########################
 #### Training process ####
