@@ -367,6 +367,16 @@ def save_eval_to_file(model, filename):
     print(f"len(evals) is {len(evals)}")
     file.close()
 
+###############
+#### Tests ####
+###############
+
+def print_tensor_shapes():
+    print(f"Embeddings tensor shape: {get_all_king_bucketed_psts().shape}")
+    print(f"Continuous tensor shape: {get_continuous_tensor(CONTINUOUS_FUNCTIONS).shape}")
+    print(f"Results tensor shape: {get_results().shape}")
+    print(f"Phases tensor shape: {get_phases().shape}")
+
 #####################
 #### Example run ####
 #####################
