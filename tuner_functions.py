@@ -24,7 +24,7 @@ libtuner.getKingSquares.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
 
-FENS_TO_KEEP = 100000 
+FENS_TO_KEEP = 10000
 # Max possible value for FENS_TO_KEEP is 7153281 for Noah.epd
 # Higher values will give an error because we don't have enough fens
 # Set to something like 100000 for debugging purposes
@@ -248,7 +248,7 @@ class Tuner(nn.Module):
         hashes.append(torch.hash_tensor(self.continuous_layer.weight))
         for emb in self.embedding_layers:
             hashes.append(torch.hash_tensor(emb.weight))
-        return torch.hash_tensor(torch.tensor(hashes))
+        return torch.hash_tensor(torch.tensor(hashes)).item()
 
 ##########################
 #### Training process ####
@@ -348,7 +348,8 @@ def print_psts(params):
 
     print("}};")
 
-def print_king_bucketed_psts(params):
+def print_king_bucketed_psts(model: Tuner):
+    params = model.embedding_layers
     print(f"    constexpr std::array<std::array<std::array<packed_eval_t, 64>, 6>, {NUM_KING_BUCKETS}> psts = " + "{{")
     for bucket in range(NUM_KING_BUCKETS):
         idx = bucket * 64
@@ -366,10 +367,10 @@ def print_king_bucketed_psts(params):
                 print(f"{" " * 23 * (1 - i % 8)}S({thing[0]:{l}},{thing[1]:{l}}), ", end = "\n" * (i % 8 - 6))
             print(" " * 19 + "{")
         print(" " * 10 + "}},")
-    print(" " * 8 + "}};")
+    print(" " * 8 + "}}; // hash=" + f"{model.get_hash()}")
 
 eval_t_name = "packed_eval_t"
-def print_continuous_weights(model):
+def print_continuous_weights(model: Tuner):
     # Step 1: Continuous weights
     weights_tensor = model.continuous_layer.weight
     index = 0
@@ -382,6 +383,7 @@ def print_continuous_weights(model):
         line = f"constexpr {eval_t_name} {feature_name}[{dims}] = {strw2};"
         print(line)
         index += dims
+    print(f"// hash={model.get_hash()}")
 
 # IIRC this function is used to make sure the engine and tuner evals match exactly
 def save_eval_to_file(model, filename):
