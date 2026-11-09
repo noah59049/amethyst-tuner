@@ -242,6 +242,14 @@ class Tuner(nn.Module):
             for layer in self.embedding_layers:
                 layer.weight.round_()
 
+    def get_hash(self):
+        # NOTE: This gives a different result depending on if you round weights first or not!
+        hashes = []
+        hashes.append(torch.hash_tensor(self.continuous_layer.weight))
+        for emb in self.embedding_layers:
+            hashes.append(torch.hash_tensor(emb.weight))
+        return torch.hash_tensor(torch.tensor(hashes))
+
 ##########################
 #### Training process ####
 ##########################
