@@ -156,19 +156,9 @@ def get_continuous_tensor_(features: list[ContinuousFeature]):
 def get_continuous_tensor():
     return get_continuous_tensor_(CONTINUOUS_FUNCTIONS)
 
-###################################################
-#### Memoization and initialization of tensors ####
-###################################################
-
-functions_to_memoize = [
-    get_all_psts, # Not used
-    get_all_king_bucketed_psts,
-    get_continuous_tensor,
-    get_results,
-    get_phases,
-]
-for func in functions_to_memoize:
-    func = functools.cache(func)
+###################################
+#### Initialization of tensors ####
+###################################
 
 def initialize_tensors():
     t0 = time.time()
