@@ -398,6 +398,16 @@ def sha256torch(x):
     b = buff.read() # This is a bytes object
     return hashlib.sha256(b).hexdigest() # This is a 64 character long hex string
 
+def get_ctypes_tensor_hashes():
+    return [
+        sha256torch(x) for x in get_all_king_bucketed_psts()
+    ] + \
+    [
+        sha256torch(get_continuous_tensor()),
+        sha256torch(get_results()),
+        sha256torch(get_phases()),
+    ]
+
 
 def print_tensor_shapes():
     print(f"Embeddings shapes: {[t.shape for t in get_all_king_bucketed_psts()]}")
