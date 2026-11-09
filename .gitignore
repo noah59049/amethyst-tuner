@@ -2,3 +2,4 @@
 *.epd
 *.dylib
 .DS_Store
+*.pyc
