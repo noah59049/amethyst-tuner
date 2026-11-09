@@ -444,16 +444,16 @@ def print_tensor_dtypes():
     print(f"Results tensor dtype: {get_results().dtype}")
     print(f"Phases tensor dtype: {get_phases().dtype}")
 
-def adam_determinism_test():
-    model1 = get_model(max_epochs=800, optimizer = "adam", verbose=False)
-    model2 = get_model(max_epochs=800, optimizer = "adam", verbose=False)
+def adam_determinism_test(epochs: int):
+    model1 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
+    model2 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
     print("Adam is deterministic") if deterministic else ("Adam is not deterministic")
     return deterministic
 
-def lbfgs_determinism_test():
-    model1 = get_model(max_epochs=100, optimizer = "lbfgs", verbose=False)
-    model2 = get_model(max_epochs=100, optimizer = "lbfgs", verbose=False)
+def lbfgs_determinism_test(epochs: int):
+    model1 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False)
+    model2 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
     print("LBFGS is deterministic") if deterministic else ("LBFGS is not deterministic")
     return deterministic
@@ -478,8 +478,8 @@ if __name__ == "__main__":
     initialize_tensors()
     print_tensor_shapes()
     print_tensor_dtypes()
-    # adam_determinism_test()
-    # lbfgs_determinism_test()
+    adam_determinism_test(epochs=8)
+    lbfgs_determinism_test(epochs=1)
 
     print_null_model()
     check_ctypes_hashes()
