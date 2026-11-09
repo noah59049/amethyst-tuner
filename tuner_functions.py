@@ -423,18 +423,22 @@ def print_tensor_dtypes():
     print(f"Phases tensor dtype: {get_phases().dtype}")
 
 def adam_determinism_test():
-    model1 = get_model(max_epochs=800, optimizer = "adam")
-    model2 = get_model(max_epochs=800, optimizer = "adam")
+    model1 = get_model(max_epochs=800, optimizer = "adam", verbose=False)
+    model2 = get_model(max_epochs=800, optimizer = "adam", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
     print("Adam is deterministic") if deterministic else ("Adam is not deterministic")
     return deterministic
 
 def lbfgs_determinism_test():
-    model1 = get_model(max_epochs=100, optimizer = "lbfgs")
-    model2 = get_model(max_epochs=100, optimizer = "lbfgs")
+    model1 = get_model(max_epochs=100, optimizer = "lbfgs", verbose=False)
+    model2 = get_model(max_epochs=100, optimizer = "lbfgs", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
     print("LBFGS is deterministic") if deterministic else ("LBFGS is not deterministic")
     return deterministic
+
+def print_null_model():
+    print_continuous_weights(Tuner())
+    print_king_bucketed_psts(Tuner())
 
 # TODO: Make a model and print out its weights
 # TODO: Print out a model's weights after one epoch
@@ -450,3 +454,5 @@ if __name__ == "__main__":
     print_tensor_dtypes()
     adam_determinism_test()
     lbfgs_determinism_test()
+
+    print_null_model()
