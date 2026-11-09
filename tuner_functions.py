@@ -448,14 +448,14 @@ def adam_determinism_test(epochs: int):
     model1 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     model2 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
-    print("Adam is deterministic") if deterministic else ("Adam is not deterministic")
+    print("Passed: adam is deterministic") if deterministic else ("FAILED: adam is not deterministic")
     return deterministic
 
 def lbfgs_determinism_test(epochs: int):
     model1 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False)
     model2 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
-    print("LBFGS is deterministic") if deterministic else ("LBFGS is not deterministic")
+    print("Passed: lbfgs is deterministic") if deterministic else ("FAILED: lbfgs is not deterministic")
     return deterministic
 
 def print_null_model():
