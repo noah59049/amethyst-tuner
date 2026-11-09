@@ -201,13 +201,15 @@ class Tuner(nn.Module):
     def __init__(self):
         super(Tuner, self).__init__()
         self.continuous_layer = nn.Linear(get_continuous_tensor().shape[1], 2, bias = False)
-        self.embedding_layers = [nn.Embedding(dim + 1, 2, padding_idx = dim) for dim in EMBEDDING_DIMS]
-        # TODO: Turn this into a nn.ModuleList or something
         with torch.no_grad():
             self.continuous_layer.weight.zero_()
-            for i, layer in enumerate(self.embedding_layers):
+
+        self.embedding_layers = nn.ModuleList()
+        for dim in EMBEDDING_DIMS:
+            layer = nn.Embedding(dim + 1, 2, padding_idx = dim)
+            with torch.no_grad():
                 layer.weight.zero_()
-                self.register_parameter(f"embedding{i}", layer.weight)
+            self.embedding_layers.append(layer)
                 
     def get_logits(
         self, 
