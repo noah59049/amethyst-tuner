@@ -346,6 +346,7 @@ def print_king_bucketed_psts(params):
             print(" " * 19 + "{")
 
             # Determine how much whitespace we need
+            # TODO: Change this so it only considers this bucket
             l1 = len(str(torch.min(params[piece_type].weight.data.int()).item()))
             l2 = len(str(torch.max(params[piece_type].weight.data.int()).item()))
             l = max(l1, l2)
