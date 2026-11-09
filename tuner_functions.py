@@ -272,7 +272,7 @@ def get_max_delta(params1, params2):
         
     return overall_max_delta
 
-def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
+def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200, verbose = True):
     # 1. Random stuff we need
     t0 = time.time()
     if model is None:
@@ -325,7 +325,8 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
         message = f"epoch {epoch}; t={int(t1-t0)}; loss={loss.item():.4f}"
         if check_max_delta:
             message += f"; max(∆w) = {max_delta:.4f}"
-        print(message)
+        if verbose:
+            print(message)
             
         # 4C. Stopping criteria
         # If none of the params have changed more than 0.5 since last time we checked, we break out of the loop.
