@@ -339,9 +339,10 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
 #### Printing weights, saving evals  ####
 #########################################
 
-# I could indent these, but why bother
+eval_t_name = "packed_eval_t"
 def print_psts(params):
-    print("constexpr std::array<std::array<packed_eval_t, 64>, 6> psts = {{")
+    # I could indent these, but why bother
+    print(f"constexpr std::array<std::array<{eval_t_name}, 64>, 6> psts = " + "{{")
     for piece_type in range(6):
         print("{")
 
@@ -358,7 +359,7 @@ def print_psts(params):
 
 def print_king_bucketed_psts(model: Tuner):
     params = model.embedding_layers
-    print(f"    constexpr std::array<std::array<std::array<packed_eval_t, 64>, 6>, {NUM_KING_BUCKETS}> psts = " + "{{")
+    print(f"    constexpr std::array<std::array<std::array<{eval_t_name}, 64>, 6>, {NUM_KING_BUCKETS}> psts = " + "{{")
     for bucket in range(NUM_KING_BUCKETS):
         idx = bucket * 64
         print(" " * 10 + "{{")
@@ -377,7 +378,6 @@ def print_king_bucketed_psts(model: Tuner):
         print(" " * 10 + "}},")
     print(" " * 8 + "}}; // hash=" + f"{model.get_hash()}")
 
-eval_t_name = "packed_eval_t"
 def print_continuous_weights(model: Tuner):
     # Step 1: Continuous weights
     weights_tensor = model.continuous_layer.weight
