@@ -29,6 +29,7 @@ FENS_TO_KEEP = 100000
 # Higher values will give an error because we don't have enough fens
 # Set to something like 100000 for debugging purposes
 
+@functools.cache
 def get_results():
     results = (c_float * FENS_TO_KEEP)()
     libtuner.getResults(results,
@@ -37,6 +38,7 @@ def get_results():
     results = torch.tensor(results)
     return results
 
+@functools.cache
 def get_phases():
     phases = (c_int * FENS_TO_KEEP)()
     libtuner.getPhases(phases,
@@ -47,12 +49,14 @@ def get_phases():
     phases = torch.transpose(phases, 0, 1).float()
     return phases
 
+@functools.cache # I don't think we really need this
 def get_king_squares(side):
     kingSquares = (c_int * FENS_TO_KEEP)()
     libtuner.getKingSquares(c_int(side), kingSquares, c_int(FENS_TO_KEEP))
     kingSquares = np.ctypeslib.as_array(kingSquares, shape=(FENS_TO_KEEP,))
     return kingSquares.reshape(-1,1)
-    
+
+@functools.cache 
 def get_mobility(side):
     mobility = (c_int * (6 * FENS_TO_KEEP))()
     libtuner.getMobility(c_int(side), mobility, c_int(FENS_TO_KEEP))
@@ -60,6 +64,7 @@ def get_mobility(side):
     return mobility.reshape(-1,6)
     # We will convert to torch tensor and to float when we stack all the tensors together
 
+@functools.cache
 def get_psts(side, piece):
     maxPieces = [8,2,2,2,2,1][piece]
     psts = (c_int * (maxPieces * FENS_TO_KEEP))()
@@ -89,6 +94,7 @@ BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
 
 NUM_KING_BUCKETS = 2
 
+@functools.cache
 def get_king_bucketed_psts(side, piece):
     psts = get_psts(side, piece)
     king_squares = get_king_squares(side).reshape(-1)
@@ -101,8 +107,10 @@ def get_king_bucketed_psts(side, piece):
     psts = torch.minimum(psts, cap)
     return psts
 
+@functools.cache
 def get_all_psts():
     return [torch.stack([get_psts(0,piece), get_psts(1, piece)]) for piece in range(6)]
+@functools.cache
 def get_all_king_bucketed_psts():
     return [torch.stack([get_king_bucketed_psts(0,piece), get_king_bucketed_psts(1, piece)]) for piece in range(6)]
 
@@ -133,6 +141,7 @@ CONTINUOUS_FUNCTIONS = [
     )
 ]
 
+@functools.cache
 def get_continuous_tensor(features: list[ContinuousFeature]):
     continuous_tensors = []
     for feature in features:
@@ -205,7 +214,12 @@ class Tuner(nn.Module):
                 layer.weight.zero_()
                 self.register_parameter(f"embedding{i}", layer.weight)
                 
-    def get_logits(self, layer, phases, embedding_tensor):
+    def get_logits(
+        self, 
+        layer, 
+        phases, 
+        embedding_tensor,
+    ):
         embeddings = layer(embedding_tensor)
         summed = torch.sum(embeddings, axis = 2)
         summed2 = summed[0] - summed[1]
