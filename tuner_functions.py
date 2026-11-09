@@ -10,6 +10,7 @@ from ctypes import POINTER, c_int, c_float
 import functools
 import io
 import hashlib
+import json
 
 ##################################
 #### Functions defined in C++ ####
@@ -398,8 +399,8 @@ def sha256torch(x):
     b = buff.read() # This is a bytes object
     return hashlib.sha256(b).hexdigest() # This is a 64 character long hex string
 
-def get_ctypes_tensor_hashes():
-    return [
+def get_ctypes_hashes():
+    hashes = [
         sha256torch(x) for x in get_all_king_bucketed_psts()
     ] + \
     [
@@ -407,6 +408,28 @@ def get_ctypes_tensor_hashes():
         sha256torch(get_results()),
         sha256torch(get_phases()),
     ]
+    hashes_dict = {"hashes":hashes}
+    return hashes_dict
+
+def overwrite_ctypes_hashes():
+    hashes = get_ctypes_hashes()
+    with open("ctypes_hashes.txt", "w") as file:
+        json.dump(hashes, file, indent=2)
+
+def check_ctypes_hashes():
+    with open("ctypes_hashes.txt", "r") as file:
+        loaded_hashes = json.load(file)
+    calculated_hashes = get_ctypes_hashes()
+    
+    if loaded_hashes == calculated_hashes:
+        print("ctypes hashes match")
+    else:
+        print("ctypes hashes DO NOT match")
+        print("--- Hashes from file ---")
+        print(loaded_hashes)
+        print("--- Hashes from calculation ---")
+        print(calculated_hashes)
+
 
 
 def print_tensor_shapes():
