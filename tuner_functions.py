@@ -110,9 +110,6 @@ def get_king_bucketed_psts(side, piece):
     return psts
 
 @functools.cache
-def get_all_psts():
-    return [torch.stack([get_psts(0,piece), get_psts(1, piece)]) for piece in range(6)]
-@functools.cache
 def get_all_king_bucketed_psts():
     return [torch.stack([get_king_bucketed_psts(0,piece), get_king_bucketed_psts(1, piece)]) for piece in range(6)]
 
@@ -342,23 +339,6 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200, verbose = Tr
 #########################################
 
 eval_t_name = "packed_eval_t"
-def print_psts(params):
-    # I could indent these, but why bother
-    print(f"constexpr std::array<std::array<{eval_t_name}, 64>, 6> psts = " + "{{")
-    for piece_type in range(6):
-        print("{")
-
-        # Determine how much whitespace we need
-        l1 = len(str(torch.min(params[piece_type].weight.data.int()).item()))
-        l2 = len(str(torch.max(params[piece_type].weight.data.int()).item()))
-        l = max(l1, l2)
-
-        for i, thing in enumerate(params[piece_type].weight.data.int()[0:64,:]):
-            print(f"S({thing[0]:{l}},{thing[1]:{l}}), ", end = "\n" * (i % 8 - 6))
-        print("},")
-
-    print("}};")
-
 def print_king_bucketed_psts(model: Tuner):
     params = model.embedding_layers
     print(f"    constexpr std::array<std::array<std::array<{eval_t_name}, 64>, 6>, {NUM_KING_BUCKETS}> psts = " + "{{")
