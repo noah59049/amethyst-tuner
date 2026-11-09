@@ -410,6 +410,15 @@ def save_eval_to_file(model, filename):
 #### Tests ####
 ###############
 
+def sha256torch(x):
+    # See Tuner.get_hash
+    buff = io.BytesIO()
+    torch.save(x, buff)
+    buff.seek(0)
+    b = buff.read() # This is a bytes object
+    return hashlib.sha256(b).hexdigest() # This is a 64 character long hex string
+
+
 def print_tensor_shapes():
     print(f"Embeddings shapes: {[t.shape for t in get_all_king_bucketed_psts()]}")
     print(f"Continuous tensor shape: {get_continuous_tensor().shape}")
