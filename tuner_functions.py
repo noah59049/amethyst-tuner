@@ -440,10 +440,14 @@ def print_null_model():
     print_continuous_weights(Tuner())
     print_king_bucketed_psts(Tuner())
 
-# TODO: Make a model and print out its weights
 # TODO: Print out a model's weights after one epoch
 # TODO: Print out a model's intermediate state
 # TODO: Various determinism tests
+
+# TODO: What I really want is to be able to make a change and then see where in the training run that changed things
+# That way, if I make a seemingly innocuous change, it should not change anything functional
+# And I want to be able to verify that
+# Starting with that the results, phases, etc have not changed
 
 if __name__ == "__main__":
     print("----------------------------")
