@@ -331,7 +331,7 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200):
         if max_delta < STOPPING_DELTA:
             break
 
-
+    # 5. Return the model
     model.round_weights()
     return model
 
