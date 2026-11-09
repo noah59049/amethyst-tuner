@@ -26,7 +26,7 @@ libtuner.getKingSquares.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
 
-FENS_TO_KEEP = 7153281
+FENS_TO_KEEP = 30000 if __name__ == "__main__" else 7153281
 # Max possible value for FENS_TO_KEEP is 7153281 for Noah.epd
 # Higher values will give an error because we don't have enough fens
 # Set to something like 100000 for debugging purposes
@@ -420,28 +420,28 @@ def print_tensor_dtypes():
     print(f"Results tensor dtype: {get_results().dtype}")
     print(f"Phases tensor dtype: {get_phases().dtype}")
 
+def adam_determinism_test():
+    model1 = get_model(max_epochs=8, optimizer = "adam")
+    model2 = get_model(max_epochs=8, optimizer = "adam")
+    deterministic = model1.get_hash() == model2.get_hash()
+    print("Adam is deterministic") if deterministic else ("Adam is not deterministic")
+    return deterministic
+
+def lbfgs_determinism_test():
+    model1 = get_model(max_epochs=1, optimizer = "lbfgs")
+    model2 = get_model(max_epochs=1, optimizer = "lbfgs")
+    deterministic = model1.get_hash() == model2.get_hash()
+    print("LBFGS is deterministic") if deterministic else ("LBFGS is not deterministic")
+    return deterministic
+
 # TODO: Make a model and print out its weights
 # TODO: Print out a model's weights after one epoch
 # TODO: Print out a model's intermediate state
+# TODO: Various determinism tests
 
-#####################
-#### Example run ####
-#####################
-"""
-model1 = Tuner()
-with torch.no_grad():
-    for piece in range(6):
-        for phase in range(2):
-            model1.embedding_layers[piece].weight[:,phase] = MATERIAL_START_WEIGHTS[phase,piece]
-            # IMPORTANT: We need to set the weights for the padding index to 0
-            model1.embedding_layers[piece].weight[NUM_KING_BUCKETS * 64] = 0
-
-model2 = get_model(model1, optimizer = "lbfgs", max_epochs = 100) # This apparently got stuck
-
-model3 = get_model(model1, optimizer = "adam") # This took like 3 hours
-
-tuner4 = get_model(optimizer = "lbfgs") # This one doesn't get stuck
-
-print_continuous_weights(model2) # Wait why model2, it got stuck 
-print_king_bucketed_psts(model2.embedding_layers) # why model2 again
-"""
+if __name__ == "__main__":
+    initialize_tensors()
+    print_tensor_shapes()
+    print_tensor_dtypes()
+    adam_determinism_test()
+    lbfgs_determinism_test()
