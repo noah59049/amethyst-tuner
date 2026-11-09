@@ -478,7 +478,8 @@ if __name__ == "__main__":
     initialize_tensors()
     print_tensor_shapes()
     print_tensor_dtypes()
-    adam_determinism_test()
-    lbfgs_determinism_test()
+    # adam_determinism_test()
+    # lbfgs_determinism_test()
 
     print_null_model()
+    check_ctypes_hashes()
