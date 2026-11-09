@@ -24,7 +24,7 @@ libtuner.getKingSquares.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
 
-FENS_TO_KEEP = 7153281 
+FENS_TO_KEEP = 100000 
 # Max possible value for FENS_TO_KEEP is 7153281 for Noah.epd
 # Higher values will give an error because we don't have enough fens
 # Set to something like 100000 for debugging purposes
@@ -372,7 +372,7 @@ def save_eval_to_file(model, filename):
 ###############
 
 def print_tensor_shapes():
-    print(f"Embeddings tensor shape: {get_all_king_bucketed_psts().shape}")
+    print(f"Embeddings shapes: {[t.shape for t in get_all_king_bucketed_psts()]}")
     print(f"Continuous tensor shape: {get_continuous_tensor(CONTINUOUS_FUNCTIONS).shape}")
     print(f"Results tensor shape: {get_results().shape}")
     print(f"Phases tensor shape: {get_phases().shape}")
