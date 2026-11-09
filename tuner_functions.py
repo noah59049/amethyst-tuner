@@ -377,6 +377,12 @@ def print_tensor_shapes():
     print(f"Results tensor shape: {get_results().shape}")
     print(f"Phases tensor shape: {get_phases().shape}")
 
+def print_tensor_dtypes():
+    print(f"Embeddings dtypes: {[t.dtype for t in get_all_king_bucketed_psts()]}")
+    print(f"Continuous tensor dtype: {get_continuous_tensor(CONTINUOUS_FUNCTIONS).dtype}")
+    print(f"Results tensor dtype: {get_results().dtype}")
+    print(f"Phases tensor dtype: {get_phases().dtype}")
+
 #####################
 #### Example run ####
 #####################
