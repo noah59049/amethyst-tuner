@@ -248,6 +248,9 @@ class Tuner(nn.Module):
             for layer in self.embedding_layers:
                 layer.weight.round_()
 
+    def get_weird_l2_norm(self):
+        return sum(p.pow(2).sum() for p in self.parameters())
+
     def get_hash(self):
         # NOTE: This gives a different result depending on if you round weights first or not!
         # Method adapted from https://stackoverflow.com/questions/63880081/how-to-convert-a-torch-tensor-into-a-byte-string
@@ -311,7 +314,7 @@ def get_model(
         optimizer.zero_grad()
         y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
         loss = loss_function(y_pred, get_results())
-        l2_norm = sum(p.pow(2).sum() for p in model.parameters())
+        l2_norm = model.get_weird_l2_norm()
         loss += l2_lambda * l2_norm
         loss.backward()
         return loss
@@ -340,7 +343,7 @@ def get_model(
         # Material weights: This is why we have a penalty for variance, not sum of squares of weights. If a queen still has the same "best squares" but gains value, this should not be regularized.
         # Difference between midgame and endgame weights: This is likely signal, not noise. This is why we track variance differently for each phase.
         # TODO: explain this better
-        l2_norm = sum(p.pow(2).sum() for p in model.parameters())
+        l2_norm = model.get_weird_l2_norm()
         loss += l2_lambda * l2_norm
         loss.backward()
         # sys.exit(1)
