@@ -274,7 +274,7 @@ def get_max_delta(params1, params2):
     overall_max_delta = 0
     for param1, param2 in zip(params1, params2):
         deltas = torch.abs(param2 - param1)
-        max_delta = torch.max(deltas)
+        max_delta = torch.max(deltas).item()
         overall_max_delta = max(max_delta, overall_max_delta)
         
     return overall_max_delta
@@ -473,6 +473,35 @@ def check_ctypes_hashes():
         print("ctypes hashes match")
     else:
         print("ctypes hashes DO NOT match")
+        print("--- Hashes from file ---")
+        print(loaded_hashes)
+        print("--- Hashes from calculation ---")
+        print(calculated_hashes)
+
+def get_minirun_hashes():
+    run_data = {}
+    model1 = get_model(
+        max_epochs=16, 
+        optimizer = "adam", 
+        verbose=False,
+        run_data = run_data
+    )
+    return run_data
+
+def overwrite_minirun_hashes():
+    hashes = get_minirun_hashes()
+    with open("minirun_hashes.txt", "w") as file:
+        json.dump(hashes, file, indent=2)
+
+def check_ctypes_hashes():
+    with open("minirun_hashes.txt", "r") as file:
+        loaded_hashes = json.load(file)
+    calculated_hashes = get_minirun_hashes()
+    
+    if loaded_hashes == calculated_hashes:
+        print("minirun hashes match")
+    else:
+        print("minirun hashes DO NOT match")
         print("--- Hashes from file ---")
         print(loaded_hashes)
         print("--- Hashes from calculation ---")
@@ -682,6 +711,8 @@ def model_forward_walkthrough():
 
 
 def main():
+    print(get_minirun_hashes())
+    return 0
     model_forward_walkthrough()
     print_huge_l2_run()
     initialize_tensors()
