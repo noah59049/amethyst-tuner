@@ -580,7 +580,13 @@ def model_forward_walkthrough():
             print(file.readline().strip())
     print("You can check that the fens match continuous features (e.g. mobility) if you like.")
 
-    
+    print("Now for the more difficult one: the embeddings")
+    print("Right now we just have king bucketed PSTs for the embeddings.")
+    print("Here's the code that generates the king bucketed PSTs:")
+    print("[torch.stack([get_king_bucketed_psts(0,piece), get_king_bucketed_psts(1, piece)]) for piece in range(6)]")
+    print("That's a lot of things, ")
+
+
 
 def main():
     model_forward_walkthrough()
