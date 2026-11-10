@@ -498,7 +498,7 @@ def print_single_epoch_model():
     print_continuous_weights(model)
     print_king_bucketed_psts(model)
 
-def print_huge_l2_adam_run():
+def print_huge_l2_run():
     run_data = {}
     tuner = get_model(
         optimizer = "adam",
@@ -674,7 +674,7 @@ def model_forward_walkthrough():
 
 def main():
     model_forward_walkthrough()
-    print_huge_l2_adam_run()
+    print_huge_l2_run()
     initialize_tensors()
     print_tensor_shapes()
     check_ctypes_hashes()
