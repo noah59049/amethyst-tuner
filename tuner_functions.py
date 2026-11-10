@@ -321,14 +321,25 @@ def get_model(
         loss.backward()
 
         # L2 regularization
+        # We only do L2 regularization on the PSTs, not on any of the continuous features
+        # The theory is, I noticed weights for some pieces differing by 100 cp between squares right next to each other.
+        # That is almost certainly due to noise in the training data
+        # So, we want the PST values to be close to each other
+        # For this reason, we regularize the variance of the piece square tables
+        # Things we do NOT regularize:
+        # Continuous features: These are much more signal than noise
+        # Material weights: This is why we have a penalty for variance, not sum of squares of weights. If a queen still has the same "best squares" but gains value, this should not be regularized.
+        # Difference between midgame and endgame weights: This is likely signal, not noise. This is why we track variance differently for each phase.
+        # TODO: explain this better
         for layer in model.embedding_layers:
-            loss += torch.var(layer.weight, correction = 0) * l2_lambda / SCALING_TERM
-            # We divide by SCALING_TERM because otherwise we would penalize stuff WAY too much
-            # In forward propagation we do return torch.sigmoid(logits / SCALING_TERM)
-            # Effectively our weights are SCALING_TERM times bigger than they would be in a normal logistic regression model
-            # They say to normalize your data but it's already one-hot encoded so I'm not going to worry about that for now.
+            for phase in 0,1:
+                loss += torch.var(layer.weight[:,phase], correction = 0) * l2_lambda / SCALING_TERM
+                # We divide by SCALING_TERM because otherwise we would penalize stuff WAY too much
+                # In forward propagation we do return torch.sigmoid(logits / SCALING_TERM)
+                # Effectively our weights are SCALING_TERM times bigger than they would be in a normal logistic regression model
+                # We don't need to normalize our data because it's one-hot encoded.
+                # TODO: This can be done more efficiently by setting the axis of torch.var
 
-            # Wait this is wrong. This regularizes variance, and it's forcing stuff to have the same mg and eg weight.
 
         if optimizer_str == "lbfgs":
             optimizer.step(closure)
@@ -622,6 +633,10 @@ def model_forward_walkthrough():
     print(f"The shape of the pawn embedding layer is {model.embedding_layers[0].weight.shape}.")
     # print(f"Here's the layer itself:\n{model.embedding_layers[0].weight}")
     print(f"The first embedding shape is {model.embedding_layers[0](get_embeddings()[0]).shape}")
+
+    # print("LOL")
+    # print(model.embedding_layers[0].weight[:,0])
+    # print(model.embedding_layers[0].weight[:,1])
     # This function seems slightly overkill
 
 
