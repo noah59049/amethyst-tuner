@@ -281,7 +281,7 @@ def get_model(
     optimizer = "lbfgs", 
     max_epochs = 3200, 
     verbose = True,
-    hashes : list[str] | None = None,
+    run_data : dict = {}, # This will get overwritten
     l2_lambda = 0.01
 ):
     # 1. Random stuff we need
@@ -289,6 +289,9 @@ def get_model(
     if model is None:
         model = Tuner()
     optimizer_str = optimizer
+
+    run_data["hash"] = []
+    run_data["loss"] = []
     
     # 2. Optimizer, loss function, closure for LBFGS
     loss_function = nn.BCELoss()
@@ -361,9 +364,9 @@ def get_model(
         if verbose:
             print(message)
             
-        # 4C. Add hash to list
-        if hashes is not None:
-            hashes.append(model.get_hash())
+        # 4C. Add data
+        run_data["hash"].append(model.get_hash())
+        run_data["loss"].append(loss.item())
 
         # 4D. Stopping criteria
         # If none of the params have changed more than 0.5 since last time we checked, we break out of the loop.
