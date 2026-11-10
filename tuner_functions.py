@@ -301,6 +301,8 @@ def get_model(
         optimizer = torch.optim.LBFGS(model.parameters())
     elif optimizer_str == "adam":
         optimizer = torch.optim.Adam(model.parameters(), lr = 10)
+    elif optimizer_str == "sgd":
+        optimizer = torch.optim.SGD(model.parameters(), lr = 10)
     else:
         assert False # Optimizer must be "lbfgs" or "adam"
     
@@ -501,7 +503,7 @@ def print_single_epoch_model():
 def print_huge_l2_run():
     run_data = {}
     tuner = get_model(
-        optimizer = "adam",
+        optimizer = "sgd",
         l2_lambda = 1e10,
         run_data = run_data,
         max_epochs = 32
