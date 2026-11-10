@@ -249,7 +249,7 @@ class Tuner(nn.Module):
                 layer.weight.round_()
 
     def get_weird_l2_norm(self):
-        return sum(p.pow(2).sum() for p in self.parameters())
+        return sum(p.pow(2).sum() for p in self.parameters() if p.shape[1] == 2)
 
     def get_hash(self):
         # NOTE: This gives a different result depending on if you round weights first or not!
