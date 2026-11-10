@@ -604,6 +604,7 @@ def model_forward_walkthrough():
     print("And let's just see the first 3 rows.")
     print(f"So the padding index is {EMBEDDING_DIMS[0]}. That means no piece.")
     print(get_king_bucketed_psts(0, 0)[0:3,:])
+    # This function seems slightly overkill
 
 
 
