@@ -633,14 +633,14 @@ def lbfgs_determinism_test(epochs: int = 2):
 
 def l2_changes_results_test():
     passed = True
-    model1 = get_model(max_epochs=10, optimizer = "adam", verbose=False, l2_lambda=0)
+    model1 = get_model(max_epochs=30, optimizer = "adam", verbose=False, l2_lambda=0)
 
-    model2 = get_model(max_epochs=10, optimizer = "adam", verbose=True, l2_lambda=1e-2)
+    model2 = get_model(max_epochs=30, optimizer = "adam", verbose=True, l2_lambda=1e-2)
     passed &= model1.get_hash() != model2.get_hash()
     if not passed:
         print("FAILED: L2 does not change results for adam")
-    model1 = get_model(max_epochs=4, optimizer = "lbfgs", verbose=False, l2_lambda=0)
-    model2 = get_model(max_epochs=4, optimizer = "lbfgs", verbose=True, l2_lambda=1e-2)
+    model1 = get_model(max_epochs=12, optimizer = "lbfgs", verbose=False, l2_lambda=0)
+    model2 = get_model(max_epochs=12, optimizer = "lbfgs", verbose=True, l2_lambda=1e-2)
     passed &= model1.get_hash() != model2.get_hash()
     if not passed:
         print("FAILED: L2 does not change results for lbfgs")
