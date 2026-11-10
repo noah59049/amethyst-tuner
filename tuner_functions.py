@@ -588,13 +588,21 @@ def lbfgs_determinism_test(epochs: int = 2):
     print("Passed: lbfgs is deterministic" if deterministic else "FAILED: lbfgs is not deterministic")
     return deterministic
 
-def l2_changes_results_test(epochs: int = 10, optimizer = "adam"):
-    model1 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False, l2_lambda=0)
-    model2 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False, l2_lambda=1e4)
-    passed = model1.get_hash() != model2.get_hash()
-    print("Passed: L2 changes results" if passed else "FAILED: L2 does not change results")
+def l2_changes_results_test():
+    passed = True
+    model1 = get_model(max_epochs=10, optimizer = "adam", verbose=False, l2_lambda=0)
+    model2 = get_model(max_epochs=10, optimizer = "adam", verbose=False, l2_lambda=1e4)
+    passed &= model1.get_hash() != model2.get_hash()
+    if not passed:
+        print("FAILED: L2 does not change results for adam")
+    model1 = get_model(max_epochs=4, optimizer = "lbfgs", verbose=False, l2_lambda=0)
+    model2 = get_model(max_epochs=4, optimizer = "lbfgs", verbose=False, l2_lambda=1e4)
+    passed &= model1.get_hash() != model2.get_hash()
+    if not passed:
+        print("FAILED: L2 does not change results for lbfgs")
+    if passed:
+        print("Passed: adam and lbfgs both chanage results")
     return passed
-
 
 ALL_TESTS = [
     ctypes_shapes_test,
