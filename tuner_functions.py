@@ -249,7 +249,12 @@ class Tuner(nn.Module):
                 layer.weight.round_()
 
     def get_weird_l2_norm(self): # We only take the L2 norm of embeddings
-        return sum((p.pow(2).sum(axis = 0) - p.sum(axis = 0).pow(2)).sum() for p in self.parameters() if p.shape[1] == 2)
+        return sum((p.pow(2).sum(axis = 0) - p.sum(axis = 0).pow(2)).sum() for p in self.parameters() if p.shape[1] == 2) / (SCALING_TERM / 24) ** 2
+        # Instead of taking the linear product of 1-hot tensors and stuff and then a sigmoid,
+        # We take the linear product, then multiply by 24 implicity (phases), then divide by SCALING_TERM, then take the sigmoid.
+        # Therefore weights need to be SCALING_TERM / 24 times bigger than they would normally be.
+        # Therefore the L2 norm is (SCALING_TERM / 24)^2 times bigger than it should be.
+        # So we divide it by (SCALING_TERM / 24)^2
 
     def get_hash(self):
         # NOTE: This gives a different result depending on if you round weights first or not!
