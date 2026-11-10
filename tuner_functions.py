@@ -568,8 +568,13 @@ def run_all_tests():
         print("---- All tests passed ----")
         print("--------------------------")
 
+def model_forward_walkthrough():
+    print("Here's the continuous tensor shape:")
+    print(get_continuous_tensor().shape)
+
 if __name__ == "__main__":
 
     initialize_tensors()
     run_all_tests()
     check_ctypes_hashes()
+    print_tensor_shapes()
