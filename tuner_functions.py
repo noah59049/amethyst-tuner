@@ -281,7 +281,7 @@ def get_model(
     optimizer = "lbfgs", 
     max_epochs = 3200, 
     verbose = True,
-    run_data : dict = {}, # This will get overwritten
+    run_data : dict = {},
     l2_lambda = 0.01
 ):
     # 1. Random stuff we need
@@ -292,6 +292,7 @@ def get_model(
 
     run_data["hash"] = []
     run_data["loss"] = []
+    run_data["bce_loss"] = []
     
     # 2. Optimizer, loss function, closure for LBFGS
     loss_function = nn.BCELoss()
@@ -321,6 +322,7 @@ def get_model(
         # 4A. Forward pass, loss, backpropagation
         y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
         loss = loss_function(y_pred, get_results())
+        bce_loss = loss.item()
 
         # L2 regularization
         # We only do L2 regularization on the PSTs, not on any of the continuous features
@@ -366,6 +368,7 @@ def get_model(
             
         # 4C. Add data
         run_data["hash"].append(model.get_hash())
+        run_data["bce_loss"].append(bce_loss.item())
         run_data["loss"].append(loss.item())
 
         # 4D. Stopping criteria
