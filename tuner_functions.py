@@ -588,8 +588,23 @@ def model_forward_walkthrough():
     print("Now for the more difficult one: the embeddings")
     print("Right now we just have king bucketed PSTs for the embeddings.")
     print("Here's the code that generates the king bucketed PSTs:")
-    print("[torch.stack([get_king_bucketed_psts(0,piece), get_king_bucketed_psts(1, piece)]) for piece in range(6)]")
-    print("That's a lot of things, ")
+    print(
+    """
+    king_bucketed_psts = []
+    for piece in range(6):
+        these_psts_ = [get_king_bucketed_psts(side,piece) for side in (0,1)]
+        these_psts = torch.stack(these_psts_)
+        king_bucketed_psts.append(these_psts)
+    return king_bucketed_psts
+    """
+    )
+    print("So we see that it's a list of 6 tensors. What's one thing in that list?")
+    print("[get_king_bucketed_psts(side,piece) for side in (0,1)], which will then get stacked")
+    print("Let's examine king bucketed PSTs for pawn and white (piece = 0, side = 0)")
+    print("And let's just see the first 3 rows.")
+    print(f"So the padding index is {EMBEDDING_DIMS[0]}. That means no piece.")
+    print(get_king_bucketed_psts(0, 0)[0:3,:])
+
 
 
 
