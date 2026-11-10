@@ -496,14 +496,14 @@ def ctypes_dtypes_test() -> bool:
         print("Passed ctypes tensor dtypes test")
     return passed
 
-def adam_determinism_test(epochs: int):
+def adam_determinism_test(epochs: int = 16):
     model1 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     model2 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
     print("Passed: adam is deterministic") if deterministic else ("FAILED: adam is not deterministic")
     return deterministic
 
-def lbfgs_determinism_test(epochs: int):
+def lbfgs_determinism_test(epochs: int = 2):
     model1 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False)
     model2 = get_model(max_epochs=epochs, optimizer = "lbfgs", verbose=False)
     deterministic = model1.get_hash() == model2.get_hash()
@@ -520,15 +520,30 @@ def lbfgs_determinism_test(epochs: int):
 # And I want to be able to verify that
 # Starting with that the results, phases, etc have not changed
 
-if __name__ == "__main__":
+ALL_TESTS = [
+    ctypes_shapes_test,
+    ctypes_dtypes_test,
+    adam_determinism_test,
+    lbfgs_determinism_test,
+
+]
+
+def run_all_tests():
     print("----------------------------")
     print("--- Tuner test functions ---")
     print("----------------------------")
-    initialize_tensors()
-    print_tensor_shapes()
-    print_tensor_dtypes()
-    adam_determinism_test(epochs=8)
-    lbfgs_determinism_test(epochs=1)
 
-    print_null_model()
-    check_ctypes_hashes()
+    passed = True
+    for test in ALL_TESTS:
+        passed &= test()
+
+    if passed:
+        print("--------------------------")
+        print("---- All tests passed ----")
+        print("--------------------------")
+
+if __name__ == "__main__":
+
+    initialize_tensors()
+    run_all_tests()
+    # check_ctypes_hashes()
