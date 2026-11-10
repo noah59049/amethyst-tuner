@@ -360,7 +360,7 @@ def get_model(
             max_delta = get_max_delta(previous_params, current_params)
             previous_params = current_params
 
-        message = f"epoch {epoch}; t={int(t1-t0)}; loss={loss.item():.4f}"
+        message = f"epoch {epoch}; t={int(t1-t0)}; bce_loss={bce_loss:.4f}; loss={loss.item():.4f}"
         if check_max_delta:
             message += f"; max(∆w) = {max_delta:.4f}"
         if verbose:
