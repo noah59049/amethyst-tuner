@@ -113,7 +113,12 @@ def get_king_bucketed_psts(side, piece):
 
 @functools.cache
 def get_all_king_bucketed_psts():
-    return [torch.stack([get_king_bucketed_psts(0,piece), get_king_bucketed_psts(1, piece)]) for piece in range(6)]
+    king_bucketed_psts = []
+    for piece in range(6):
+        these_psts_ = [get_king_bucketed_psts(side,piece) for side in (0,1)]
+        these_psts = torch.stack(these_psts_)
+        king_bucketed_psts.append(these_psts)
+    return king_bucketed_psts
 
 ###############################################
 #### Making the continuous features tensor ####
