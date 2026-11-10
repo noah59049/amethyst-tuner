@@ -444,17 +444,15 @@ def print_tensor_dtypes():
     print(f"Results tensor dtype: {get_results().dtype}")
     print(f"Phases tensor dtype: {get_phases().dtype}")
 
-def ctypes_shapes_test():
+def ctypes_shapes_test() -> bool:
     passed = True
 
     # 1. King bucketed PSTs
-    # The "correct answer" for shapes is baked in the test here
-    # Determined by the outputs when I wrote this function
     for i, tensor in enumerate(get_all_king_bucketed_psts()):
         max_pieces = [8,2,2,2,2,1][i]
         expected_shape = torch.Size([2, FENS_TO_KEEP, max_pieces])
         if tensor.shape != expected_shape:
-            print(f"FAILED tensor shapes test: king bucketed PSTs[{i}] expected shape {expected_shape} but has shape {tensor.shape}")
+            print(f"FAILED ctypes tensor shapes test: king bucketed PSTs[{i}] expected shape {expected_shape} but has shape {tensor.shape}")
             passed = False
 
     # 2. Continuous tensor
@@ -462,16 +460,39 @@ def ctypes_shapes_test():
 
     # 3. Results tensor
     if get_results().shape != torch.Size([FENS_TO_KEEP]):
-        print(f"FAILED tensor shapes test: results expected shape {torch.Size([FENS_TO_KEEP])} but has shape {get_results().shape}")
+        print(f"FAILED ctypes tensor shapes test: results expected shape {torch.Size([FENS_TO_KEEP])} but has shape {get_results().shape}")
         passed = False
 
-    # 3. Phases tensor
+    # 4. Phases tensor
     if get_phases().shape != torch.Size([FENS_TO_KEEP, 2]):
-        print(f"FAILED tensor shapes test: results expected shape {torch.Size([FENS_TO_KEEP, 2])} but has shape {get_phases().shape}")
+        print(f"FAILED ctypes tensor shapes test: results expected shape {torch.Size([FENS_TO_KEEP, 2])} but has shape {get_phases().shape}")
         passed = False
 
     if passed:
         print("Passed ctypes tensor shapes test")
+    return passed
+
+def ctypes_dtypes_test() -> bool:
+    passed = True
+
+    # 1. King bucketed PSTs
+    for i, tensor in enumerate(get_all_king_bucketed_psts()):
+        if tensor.dtype != torch.int32:
+            print(f"FAILED ctypes tensor dtypes test: king bucketed PSTs[{i}] expected dtype {torch.int32} but has type {tensor.dtype}")
+            passed = False
+
+    for name, tensor in zip(
+        ["continuous", "results", "phases"],
+        [get_continuous_tensor(), get_results(), get_phases()]
+    ):
+        if tensor.dtype != torch.float32:
+            print(f"FAILED ctypes tensor dtypes test: expected type {torch.float32} for {name} but got {tensor.dtype}")
+            passed = False
+
+    if passed:
+        print("Passed ctypes tensor dtypes test")
+    return passed
+
 
 
 def adam_determinism_test(epochs: int):
