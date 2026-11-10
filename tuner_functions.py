@@ -502,13 +502,17 @@ def print_single_epoch_model():
 
 def print_huge_l2_run():
     run_data = {}
-    tuner = get_model(
-        optimizer = "sgd",
-        l2_lambda = 1e2,
-        run_data = run_data,
-        max_epochs = 32
-    )
-    return tuner, run_data
+    try:
+        tuner = get_model(
+            optimizer = "sgd",
+            l2_lambda = 1e2,
+            run_data = run_data,
+            max_epochs = 32
+        )
+        return tuner, run_data
+    except RuntimeError as e:
+        print(f"we got a RuntimeError: {e}")
+
 
 def ctypes_shapes_test() -> bool:
     passed = True
