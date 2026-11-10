@@ -293,6 +293,7 @@ def get_model(
     run_data["hash"] = []
     run_data["loss"] = []
     run_data["bce_loss"] = []
+    run_data["max_delta"] = []
     
     # 2. Optimizer, loss function, closure for LBFGS
     loss_function = nn.BCELoss()
@@ -370,6 +371,7 @@ def get_model(
         run_data["hash"].append(model.get_hash())
         run_data["bce_loss"].append(bce_loss.item())
         run_data["loss"].append(loss.item())
+        run_data["max_delta"].append(max_delta)
 
         # 4D. Stopping criteria
         # If none of the params have changed more than 0.5 since last time we checked, we break out of the loop.
