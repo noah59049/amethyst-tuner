@@ -328,6 +328,8 @@ def get_model(
             # Effectively our weights are SCALING_TERM times bigger than they would be in a normal logistic regression model
             # They say to normalize your data but it's already one-hot encoded so I'm not going to worry about that for now.
 
+            # Wait this is wrong. This regularizes variance, and it's forcing stuff to have the same mg and eg weight.
+
         if optimizer_str == "lbfgs":
             optimizer.step(closure)
         else:
@@ -608,12 +610,18 @@ def model_forward_walkthrough():
     return king_bucketed_psts
     """
     )
-    print("So we see that it's a list of 6 tensors. What's one thing in that list?")
+    print("So we see that king_bucketed_psts is a list of 6 tensors. What is 1 element in that list?")
     print("[get_king_bucketed_psts(side,piece) for side in (0,1)], which will then get stacked")
     print("Let's examine king bucketed PSTs for pawn and white (piece = 0, side = 0)")
     print("And let's just see the first 3 rows.")
     print(f"So the padding index is {EMBEDDING_DIMS[0]}. That means no piece.")
     print(get_king_bucketed_psts(0, 0)[0:3,:])
+    print("Now let's look at the layers of the model.")
+    model = get_model(optimizer = "adam", max_epochs=4, verbose = False)
+    print("Let's begin with the embedding layer")
+    print(f"The shape of the pawn embedding layer is {model.embedding_layers[0].weight.shape}.")
+    # print(f"Here's the layer itself:\n{model.embedding_layers[0].weight}")
+    print(f"The first embedding shape is {model.embedding_layers[0](get_embeddings()[0]).shape}")
     # This function seems slightly overkill
 
 
