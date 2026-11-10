@@ -321,7 +321,6 @@ def get_model(
         # 4A. Forward pass, loss, backpropagation
         y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
         loss = loss_function(y_pred, get_results())
-        loss.backward()
 
         # L2 regularization
         # We only do L2 regularization on the PSTs, not on any of the continuous features
@@ -343,6 +342,7 @@ def get_model(
                 # We don't need to normalize our data because it's one-hot encoded.
                 # TODO: This can be done more efficiently by setting the axis of torch.var
 
+        loss.backward()
 
         if optimizer_str == "lbfgs":
             optimizer.step(closure)
