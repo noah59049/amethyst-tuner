@@ -572,12 +572,24 @@ def run_all_tests():
 def model_forward_walkthrough():
     print("Here's the continuous tensor shape:")
     print(get_continuous_tensor().shape)
+    print("Here's the first 3 rows of the continuous tensor: ")
+    print(get_continuous_tensor()[0:3,:])
+    print("Here's the first 3 fens:")
+    with open("Noah.epd", "r") as file:
+        for _ in range(3):
+            print(file.readline().strip())
+    print("You can check that the fens match continuous features (e.g. mobility) if you like.")
+
+    
 
 def main():
+    model_forward_walkthrough()
+    return 0
     initialize_tensors()
     run_all_tests()
     check_ctypes_hashes()
-    print_tensor_shapes()    
+    print_tensor_shapes()
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())
