@@ -544,15 +544,6 @@ def lbfgs_determinism_test(epochs: int = 2):
     print("Passed: lbfgs is deterministic") if deterministic else ("FAILED: lbfgs is not deterministic")
     return deterministic
 
-# TODO: Print out a model's weights after one epoch
-# TODO: Print out a model's intermediate state
-# TODO: Various determinism tests
-
-# TODO: What I really want is to be able to make a change and then see where in the training run that changed things
-# That way, if I make a seemingly innocuous change, it should not change anything functional
-# And I want to be able to verify that
-# Starting with that the results, phases, etc have not changed
-
 ALL_TESTS = [
     ctypes_shapes_test,
     ctypes_dtypes_test,
