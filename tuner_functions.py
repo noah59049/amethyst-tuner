@@ -712,7 +712,6 @@ def model_forward_walkthrough():
 
 def main():
     check_minirun_hashes()
-    return 0
     model_forward_walkthrough()
     print_huge_l2_run()
     initialize_tensors()
