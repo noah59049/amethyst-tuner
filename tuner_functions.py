@@ -496,6 +496,22 @@ def ctypes_dtypes_test() -> bool:
         print("Passed ctypes tensor dtypes test")
     return passed
 
+def null_model_test():
+    passed = True
+    model = Tuner()
+    for param in get_detached_params(model):
+        if not (param == 0).all():
+            print("FAILED null model test: some parameters are not all zero")
+            passed = False
+
+    result = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+    if not torch.all(result == 0):
+        print("FAILED null model test: result is not all zero")
+        passed = False
+    if passed:
+        print("Passed model conformable test")
+    return passed
+
 def adam_determinism_test(epochs: int = 16):
     model1 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     model2 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
@@ -510,7 +526,6 @@ def lbfgs_determinism_test(epochs: int = 2):
     print("Passed: lbfgs is deterministic") if deterministic else ("FAILED: lbfgs is not deterministic")
     return deterministic
 
-
 # TODO: Print out a model's weights after one epoch
 # TODO: Print out a model's intermediate state
 # TODO: Various determinism tests
@@ -523,6 +538,7 @@ def lbfgs_determinism_test(epochs: int = 2):
 ALL_TESTS = [
     ctypes_shapes_test,
     ctypes_dtypes_test,
+    null_model_test,
     adam_determinism_test,
     lbfgs_determinism_test,
 
