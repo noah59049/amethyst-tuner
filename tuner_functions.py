@@ -270,7 +270,13 @@ def get_max_delta(params1, params2):
         
     return overall_max_delta
 
-def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200, verbose = True):
+def get_model(
+    model = None, 
+    optimizer = "lbfgs", 
+    max_epochs = 3200, 
+    verbose = True,
+    hashes : list[str] | None = None
+):
     # 1. Random stuff we need
     t0 = time.time()
     if model is None:
@@ -326,7 +332,11 @@ def get_model(model = None, optimizer = "lbfgs", max_epochs = 3200, verbose = Tr
         if verbose:
             print(message)
             
-        # 4C. Stopping criteria
+        # 4C. Add hash to list
+        if hashes is not None:
+            hashes.append(model.get_hash())
+
+        # 4D. Stopping criteria
         # If none of the params have changed more than 0.5 since last time we checked, we break out of the loop.
         if max_delta < STOPPING_DELTA:
             break
