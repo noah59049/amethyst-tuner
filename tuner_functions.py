@@ -571,4 +571,4 @@ if __name__ == "__main__":
 
     initialize_tensors()
     run_all_tests()
-    # check_ctypes_hashes()
+    check_ctypes_hashes()
