@@ -430,6 +430,9 @@ def check_ctypes_hashes():
         print("--- Hashes from calculation ---")
         print(calculated_hashes)
 
+def print_null_model():
+    print_continuous_weights(Tuner())
+    print_king_bucketed_psts(Tuner())
 
 
 def print_tensor_shapes():
@@ -493,8 +496,6 @@ def ctypes_dtypes_test() -> bool:
         print("Passed ctypes tensor dtypes test")
     return passed
 
-
-
 def adam_determinism_test(epochs: int):
     model1 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     model2 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
@@ -509,9 +510,6 @@ def lbfgs_determinism_test(epochs: int):
     print("Passed: lbfgs is deterministic") if deterministic else ("FAILED: lbfgs is not deterministic")
     return deterministic
 
-def print_null_model():
-    print_continuous_weights(Tuner())
-    print_king_bucketed_psts(Tuner())
 
 # TODO: Print out a model's weights after one epoch
 # TODO: Print out a model's intermediate state
