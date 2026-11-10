@@ -504,7 +504,7 @@ def print_huge_l2_run():
     run_data = {}
     tuner = get_model(
         optimizer = "sgd",
-        l2_lambda = 1e10,
+        l2_lambda = 1e2,
         run_data = run_data,
         max_epochs = 32
     )
