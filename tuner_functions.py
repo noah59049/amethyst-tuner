@@ -678,9 +678,9 @@ def main():
     model_forward_walkthrough()
     print_huge_l2_adam_run()
     initialize_tensors()
-    run_all_tests()
-    check_ctypes_hashes()
     print_tensor_shapes()
+    check_ctypes_hashes()
+    run_all_tests()
     return 0
 
 if __name__ == "__main__":
