@@ -248,7 +248,7 @@ class Tuner(nn.Module):
             for layer in self.embedding_layers:
                 layer.weight.round_()
 
-    def get_weird_l2_norm(self):
+    def get_weird_l2_norm(self): # We only take the L2 norm of embeddings
         return sum(p.pow(2).sum() for p in self.parameters() if p.shape[1] == 2)
 
     def get_hash(self):
