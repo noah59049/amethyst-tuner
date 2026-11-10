@@ -612,7 +612,7 @@ ALL_TESTS = [
     null_model_test,
     adam_determinism_test,
     lbfgs_determinism_test,
-
+    l2_changes_results_test
 ]
 
 def run_all_tests():
@@ -677,7 +677,6 @@ def model_forward_walkthrough():
 def main():
     model_forward_walkthrough()
     print_huge_l2_adam_run()
-    return 0
     initialize_tensors()
     run_all_tests()
     check_ctypes_hashes()
