@@ -502,6 +502,16 @@ def print_single_epoch_model():
     print_continuous_weights(model)
     print_king_bucketed_psts(model)
 
+def print_huge_l2_adam_run():
+    run_data = {}
+    tuner = get_model(
+        optimizer = "adam",
+        l2_lambda = 1e10,
+        run_data = run_data,
+        max_epochs = 32
+    )
+    return tuner, run_data
+
 def ctypes_shapes_test() -> bool:
     passed = True
 
@@ -652,6 +662,7 @@ def model_forward_walkthrough():
 
 def main():
     model_forward_walkthrough()
+    print_huge_l2_adam_run()
     return 0
     initialize_tensors()
     run_all_tests()
