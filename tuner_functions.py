@@ -249,7 +249,7 @@ class Tuner(nn.Module):
                 layer.weight.round_()
 
     def get_weird_l2_norm(self): # We only take the L2 norm of embeddings
-        return sum(torch.var(p, axis = 1, correction = 0).sum() for p in self.parameters() if p.shape[1] == 2) / (SCALING_TERM / 24) ** 2
+        return sum(torch.var(p, axis = 0, correction = 0).sum() for p in self.parameters() if p.shape[1] == 2) / (SCALING_TERM / 24) ** 2
         # Instead of taking the linear product of 1-hot tensors and stuff and then a sigmoid,
         # We take the linear product, then multiply by 24 implicity (phases), then divide by SCALING_TERM, then take the sigmoid.
         # Therefore weights need to be SCALING_TERM / 24 times bigger than they would normally be.
@@ -713,8 +713,33 @@ def model_forward_walkthrough():
     # print(model.embedding_layers[0].weight[:,1])
     # This function seems slightly overkill
 
+def dimensions_l2_test():
+    passed = True
+    model_null = Tuner()
+    if model_null.get_weird_l2_norm() != 0:
+        print(f"FAILED: Null model has nonzero L2 norm of {model_null.get_weird_l2_norm()}")
+    model_horiz = Tuner() # 1 horizontal row is 1s
+    model_vert = Tuner() # 1 vertical column is 1s
+    with torch.no_grad():
+        model_horiz.embedding_layers[0].weight[0,:] += 1
+        model_vert.embedding_layers[0].weight[:,0] += 1
 
+    # print(model_horiz.embedding_layers[0].weight)
+    # print(model_vert.embedding_layers[0].weight)
 
+    horiz_l2 = model_horiz.get_weird_l2_norm()
+    if horiz_l2 == 0:
+        print("FAILED: L2 norm of null model with a row of 1s has zero L2 norm")
+        passed = False
+    else:
+        print(f"Passed horizontal variance test: null model with a row of 1s has L2 norm {horiz_l2}")
+    vert_l2 = model_vert.get_weird_l2_norm()
+    if vert_l2 != 0:
+        print("FAILED: null model with a column of 1s has L2 norm {vert_l2}")
+        passed = False
+    if passed:
+        print("Passed dimensions l2 test")
+    return passed
 
 def main():
     check_minirun_hashes()
@@ -727,4 +752,6 @@ def main():
     return 0
 
 if __name__ == "__main__":
+    dimensions_l2_test()
+    exit(0)
     sys.exit(main())
