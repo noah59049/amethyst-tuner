@@ -1,6 +1,7 @@
 #################
 #### Imports ####
 #################
+import sys
 import time
 import numpy as np
 import torch
@@ -572,9 +573,11 @@ def model_forward_walkthrough():
     print("Here's the continuous tensor shape:")
     print(get_continuous_tensor().shape)
 
-if __name__ == "__main__":
-
+def main():
     initialize_tensors()
     run_all_tests()
     check_ctypes_hashes()
-    print_tensor_shapes()
+    print_tensor_shapes()    
+
+if __name__ == "__main__":
+    sys.exit(main())
