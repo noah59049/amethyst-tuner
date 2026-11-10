@@ -523,8 +523,9 @@ def null_model_test():
             passed = False
 
     result = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
-    if not torch.all(result == 0):
-        print("FAILED null model test: result is not all zero")
+    if not torch.all(result == 0.5):
+        print("FAILED null model test: result is not all 0.5")
+        print(f"result is {result}")
         passed = False
     if passed:
         print("Passed model conformable test")
