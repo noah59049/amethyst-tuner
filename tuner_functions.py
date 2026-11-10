@@ -430,11 +430,6 @@ def check_ctypes_hashes():
         print("--- Hashes from calculation ---")
         print(calculated_hashes)
 
-def print_null_model():
-    print_continuous_weights(Tuner())
-    print_king_bucketed_psts(Tuner())
-
-
 def print_tensor_shapes():
     print(f"Embeddings shapes: {[t.shape for t in get_all_king_bucketed_psts()]}")
     print(f"Continuous tensor shape: {get_continuous_tensor().shape}")
@@ -446,6 +441,19 @@ def print_tensor_dtypes():
     print(f"Continuous tensor dtype: {get_continuous_tensor().dtype}")
     print(f"Results tensor dtype: {get_results().dtype}")
     print(f"Phases tensor dtype: {get_phases().dtype}")
+
+def print_null_model():
+    print_continuous_weights(Tuner())
+    print_king_bucketed_psts(Tuner())
+
+def print_single_epoch_model():
+    model = get_model(
+        optimizer = "lbfgs",
+        max_epochs=1, 
+        verbose=False
+    )
+    print_continuous_weights(model)
+    print_king_bucketed_psts(model)
 
 def ctypes_shapes_test() -> bool:
     passed = True
