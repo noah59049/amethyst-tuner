@@ -276,13 +276,13 @@ def get_max_delta(params1, params2):
         
     return overall_max_delta
 
-l2_lambda = 0.01
 def get_model(
     model = None, 
     optimizer = "lbfgs", 
     max_epochs = 3200, 
     verbose = True,
-    hashes : list[str] | None = None
+    hashes : list[str] | None = None,
+    l2_lambda = 0.01
 ):
     # 1. Random stuff we need
     t0 = time.time()
