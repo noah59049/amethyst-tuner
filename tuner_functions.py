@@ -444,6 +444,36 @@ def print_tensor_dtypes():
     print(f"Results tensor dtype: {get_results().dtype}")
     print(f"Phases tensor dtype: {get_phases().dtype}")
 
+def ctypes_shapes_test():
+    passed = True
+
+    # 1. King bucketed PSTs
+    # The "correct answer" for shapes is baked in the test here
+    # Determined by the outputs when I wrote this function
+    for i, tensor in enumerate(get_all_king_bucketed_psts()):
+        max_pieces = [8,2,2,2,2,1][i]
+        expected_shape = torch.Size([2, FENS_TO_KEEP, max_pieces])
+        if tensor.shape != expected_shape:
+            print(f"FAILED tensor shapes test: king bucketed PSTs[{i}] expected shape {expected_shape} but has shape {tensor.shape}")
+            passed = False
+
+    # 2. Continuous tensor
+    # We will skip this, it can change too much
+
+    # 3. Results tensor
+    if get_results().shape != torch.Size([FENS_TO_KEEP]):
+        print(f"FAILED tensor shapes test: results expected shape {torch.Size([FENS_TO_KEEP])} but has shape {get_results().shape}")
+        passed = False
+
+    # 3. Phases tensor
+    if get_phases().shape != torch.Size([FENS_TO_KEEP, 2]):
+        print(f"FAILED tensor shapes test: results expected shape {torch.Size([FENS_TO_KEEP, 2])} but has shape {get_phases().shape}")
+        passed = False
+
+    if passed:
+        print("Passed ctypes tensor shapes test")
+
+
 def adam_determinism_test(epochs: int):
     model1 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
     model2 = get_model(max_epochs=epochs, optimizer = "adam", verbose=False)
