@@ -336,22 +336,10 @@ def get_model(
         # Material weights: This is why we have a penalty for variance, not sum of squares of weights. If a queen still has the same "best squares" but gains value, this should not be regularized.
         # Difference between midgame and endgame weights: This is likely signal, not noise. This is why we track variance differently for each phase.
         # TODO: explain this better
-        for layer in model.embedding_layers:
-            vars = torch.var(
-                layer.weight, 
-                correction = 0,
-                axis = 0
-            )
-            l2_penalty = torch.sum(vars)  * l2_lambda / SCALING_TERM
-            print(l2_penalty)
-            loss += l2_penalty
-            # We divide by SCALING_TERM because otherwise we would penalize stuff WAY too much
-            # In forward propagation we do return torch.sigmoid(logits / SCALING_TERM)
-            # Effectively our weights are SCALING_TERM times bigger than they would be in a normal logistic regression model
-            # We don't need to normalize our data because it's one-hot encoded.
-            # TODO: This can be done more efficiently by setting the axis of torch.var
-
+        l2_norm = sum(p.pow(2).sum() for p in model.parameters())
+        loss += l2_lambda * l2_norm
         loss.backward()
+        # sys.exit(1)
 
         if optimizer_str == "lbfgs":
             optimizer.step(closure)
