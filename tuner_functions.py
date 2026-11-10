@@ -369,7 +369,7 @@ def get_model(
             
         # 4C. Add data
         run_data["hash"].append(model.get_hash())
-        run_data["bce_loss"].append(bce_loss.item())
+        run_data["bce_loss"].append(bce_loss)
         run_data["loss"].append(loss.item())
         run_data["max_delta"].append(max_delta)
 
