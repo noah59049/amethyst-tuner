@@ -112,7 +112,7 @@ def get_king_bucketed_psts(side, piece):
     return psts
 
 @functools.cache
-def get_all_king_bucketed_psts():
+def get_embeddings():
     king_bucketed_psts = []
     for piece in range(6):
         these_psts_ = [get_king_bucketed_psts(side,piece) for side in (0,1)]
@@ -168,7 +168,7 @@ def get_continuous_tensor():
 
 def initialize_tensors():
     t0 = time.time()
-    ONE_HOT_TENSORS = get_all_king_bucketed_psts()
+    ONE_HOT_TENSORS = get_embeddings()
     t1 = time.time()
     print(f"Made embeddings in {t1-t0:.2f} seconds")
 
@@ -301,7 +301,7 @@ def get_model(
     def closure():
         # This is the closure required for LBFGS
         optimizer.zero_grad()
-        y_pred = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+        y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
         loss = loss_function(y_pred, get_results())
         loss.backward()
         return loss
@@ -315,7 +315,7 @@ def get_model(
     # 4. Start the training loop
     for epoch in range(1, max_epochs + 1):
         # 4A. Forward pass, loss, backpropagation
-        y_pred = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+        y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
         loss = loss_function(y_pred, get_results())
         loss.backward()
         if optimizer_str == "lbfgs":
@@ -394,7 +394,7 @@ def print_continuous_weights(model: Tuner):
 
 # IIRC this function is used to make sure the engine and tuner evals match exactly
 def save_eval_to_file(model, filename):
-    evals = model.forward_as_in_engine(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+    evals = model.forward_as_in_engine(get_phases(), get_continuous_tensor(), get_embeddings())
     with open(filename, "w") as file:
         for eval_ in evals:
             file.write(str(int(eval_.item())))
@@ -417,7 +417,7 @@ def sha256torch(x):
 
 def get_ctypes_hashes():
     hashes = [
-        sha256torch(x) for x in get_all_king_bucketed_psts()
+        sha256torch(x) for x in get_embeddings()
     ] + \
     [
         sha256torch(get_continuous_tensor()),
@@ -447,13 +447,13 @@ def check_ctypes_hashes():
         print(calculated_hashes)
 
 def print_tensor_shapes():
-    print(f"Embeddings shapes: {[t.shape for t in get_all_king_bucketed_psts()]}")
+    print(f"Embeddings shapes: {[t.shape for t in get_embeddings()]}")
     print(f"Continuous tensor shape: {get_continuous_tensor().shape}")
     print(f"Results tensor shape: {get_results().shape}")
     print(f"Phases tensor shape: {get_phases().shape}")
 
 def print_tensor_dtypes():
-    print(f"Embeddings dtypes: {[t.dtype for t in get_all_king_bucketed_psts()]}")
+    print(f"Embeddings dtypes: {[t.dtype for t in get_embeddings()]}")
     print(f"Continuous tensor dtype: {get_continuous_tensor().dtype}")
     print(f"Results tensor dtype: {get_results().dtype}")
     print(f"Phases tensor dtype: {get_phases().dtype}")
@@ -475,7 +475,7 @@ def ctypes_shapes_test() -> bool:
     passed = True
 
     # 1. King bucketed PSTs
-    for i, tensor in enumerate(get_all_king_bucketed_psts()):
+    for i, tensor in enumerate(get_embeddings()):
         max_pieces = [8,2,2,2,2,1][i]
         expected_shape = torch.Size([2, FENS_TO_KEEP, max_pieces])
         if tensor.shape != expected_shape:
@@ -503,7 +503,7 @@ def ctypes_dtypes_test() -> bool:
     passed = True
 
     # 1. King bucketed PSTs
-    for i, tensor in enumerate(get_all_king_bucketed_psts()):
+    for i, tensor in enumerate(get_embeddings()):
         if tensor.dtype != torch.int32:
             print(f"FAILED ctypes tensor dtypes test: king bucketed PSTs[{i}] expected dtype {torch.int32} but has type {tensor.dtype}")
             passed = False
@@ -528,7 +528,7 @@ def null_model_test():
             print("FAILED null model test: some parameters are not all zero")
             passed = False
 
-    result = model(get_phases(), get_continuous_tensor(), get_all_king_bucketed_psts())
+    result = model(get_phases(), get_continuous_tensor(), get_embeddings())
     if not torch.all(result == 0.5):
         print("FAILED null model test: result is not all 0.5")
         print(f"result is {result}")
