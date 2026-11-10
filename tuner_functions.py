@@ -249,7 +249,7 @@ class Tuner(nn.Module):
                 layer.weight.round_()
 
     def get_weird_l2_norm(self): # We only take the L2 norm of embeddings
-        return sum((p.pow(2).sum(axis = 1) - p.sum(axis = 1).pow(2)).sum() for p in self.parameters() if p.shape[1] == 2) / (SCALING_TERM / 24) ** 2
+        return sum(torch.var(p, axis = 1, correction = 0).sum() for p in self.parameters() if p.shape[1] == 2) / (SCALING_TERM / 24) ** 2
         # Instead of taking the linear product of 1-hot tensors and stuff and then a sigmoid,
         # We take the linear product, then multiply by 24 implicity (phases), then divide by SCALING_TERM, then take the sigmoid.
         # Therefore weights need to be SCALING_TERM / 24 times bigger than they would normally be.
@@ -635,12 +635,12 @@ def l2_changes_results_test():
     passed = True
     model1 = get_model(max_epochs=10, optimizer = "adam", verbose=False, l2_lambda=0)
 
-    model2 = get_model(max_epochs=10, optimizer = "adam", verbose=True, l2_lambda=1e-4)
+    model2 = get_model(max_epochs=10, optimizer = "adam", verbose=True, l2_lambda=1e-2)
     passed &= model1.get_hash() != model2.get_hash()
     if not passed:
         print("FAILED: L2 does not change results for adam")
     model1 = get_model(max_epochs=4, optimizer = "lbfgs", verbose=False, l2_lambda=0)
-    model2 = get_model(max_epochs=4, optimizer = "lbfgs", verbose=True, l2_lambda=1e-7)
+    model2 = get_model(max_epochs=4, optimizer = "lbfgs", verbose=True, l2_lambda=1e-2)
     passed &= model1.get_hash() != model2.get_hash()
     if not passed:
         print("FAILED: L2 does not change results for lbfgs")
