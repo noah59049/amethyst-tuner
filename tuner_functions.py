@@ -493,7 +493,7 @@ def overwrite_minirun_hashes():
     with open("minirun_hashes.txt", "w") as file:
         json.dump(hashes, file, indent=2)
 
-def check_ctypes_hashes():
+def check_minirun_hashes():
     with open("minirun_hashes.txt", "r") as file:
         loaded_hashes = json.load(file)
     calculated_hashes = get_minirun_hashes()
@@ -711,7 +711,7 @@ def model_forward_walkthrough():
 
 
 def main():
-    print(get_minirun_hashes())
+    check_minirun_hashes()
     return 0
     model_forward_walkthrough()
     print_huge_l2_run()
