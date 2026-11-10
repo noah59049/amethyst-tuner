@@ -276,6 +276,7 @@ def get_max_delta(params1, params2):
         
     return overall_max_delta
 
+l2_lambda = 0.01
 def get_model(
     model = None, 
     optimizer = "lbfgs", 
@@ -318,6 +319,15 @@ def get_model(
         y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
         loss = loss_function(y_pred, get_results())
         loss.backward()
+
+        # L2 regularization
+        for layer in model.embedding_layers:
+            loss += torch.var(layer.weight, correction = 0) * l2_lambda / SCALING_TERM
+            # We divide by SCALING_TERM because otherwise we would penalize stuff WAY too much
+            # In forward propagation we do return torch.sigmoid(logits / SCALING_TERM)
+            # Effectively our weights are SCALING_TERM times bigger than they would be in a normal logistic regression model
+            # They say to normalize your data but it's already one-hot encoded so I'm not going to worry about that for now.
+
         if optimizer_str == "lbfgs":
             optimizer.step(closure)
         else:
