@@ -304,7 +304,7 @@ def get_model(
     elif optimizer_str == "sgd":
         optimizer = torch.optim.SGD(model.parameters(), lr = 10)
     else:
-        assert False # Optimizer must be "lbfgs" or "adam"
+        assert False # Optimizer must be "lbfgs" or "adam" or "sgd"
     
     def closure():
         # This is the closure required for LBFGS
