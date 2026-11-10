@@ -309,6 +309,8 @@ def get_model(
         optimizer.zero_grad()
         y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
         loss = loss_function(y_pred, get_results())
+        l2_norm = sum(p.pow(2).sum() for p in model.parameters())
+        loss += l2_lambda * l2_norm
         loss.backward()
         return loss
     
