@@ -39,23 +39,23 @@ VALIDATION_PERCENT = 10 if __name__ == "__main__" else 0 # Don't mess with the t
 TRAINING_FENS = math.ceil(FENS_TO_KEEP * (1 - VALIDATION_PERCENT / 100))
 
 @functools.cache
-def get_results(stage : str = "all"):
+def get_results(dataset_type : str = "all"):
     results = (c_float * FENS_TO_KEEP)()
     libtuner.getResults(results,
                        c_int(FENS_TO_KEEP))
     results = np.ctypeslib.as_array(results, shape = (FENS_TO_KEEP,))
     results = torch.tensor(results)
-    if stage == "train":
+    if dataset_type == "train":
         return results[:TRAINING_FENS]
-    elif stage == "val":
+    elif dataset_type == "val":
         return results[TRAINING_FENS:]
-    elif stage == "all":
+    elif dataset_type == "all":
         return results
     else:
-        raise ValueError(f"Unrecognized value: {stage=}")
+        raise ValueError(f"Unrecognized value: {dataset_type=}")
 
 @functools.cache
-def get_phases(stage : str = "all"):
+def get_phases(dataset_type : str = "all"):
     phases = (c_int * FENS_TO_KEEP)()
     libtuner.getPhases(phases,
                        c_int(FENS_TO_KEEP))
@@ -63,14 +63,14 @@ def get_phases(stage : str = "all"):
     phases = torch.tensor(phases)
     phases = torch.stack([phases, 24 - phases])
     phases = torch.transpose(phases, 0, 1).float()
-    if stage == "train":
+    if dataset_type == "train":
         return phases[:TRAINING_FENS,:]
-    elif stage == "val":
+    elif dataset_type == "val":
         return phases[TRAINING_FENS:,:]
-    elif stage == "all":
+    elif dataset_type == "all":
         return phases
     else:
-        raise ValueError(f"Unrecognized value: {stage=}")
+        raise ValueError(f"Unrecognized value: {dataset_type=}")
 
 def get_king_squares(side):
     kingSquares = (c_int * FENS_TO_KEEP)()
@@ -127,19 +127,19 @@ def get_king_bucketed_psts(side, piece):
     return psts
 
 @functools.cache
-def get_embeddings(stage : str = "all"):
+def get_embeddings(dataset_type : str = "all"):
     king_bucketed_psts = []
     for piece in range(6):
         these_psts_ = [get_king_bucketed_psts(side,piece) for side in (0,1)]
         these_psts = torch.stack(these_psts_)
-        if stage == "train":
+        if dataset_type == "train":
             king_bucketed_psts.append(these_psts[:,:TRAINING_FENS,:])
-        elif stage == "val":
+        elif dataset_type == "val":
             king_bucketed_psts.append(these_psts[:,TRAINING_FENS:,:])
-        elif stage == "all":
+        elif dataset_type == "all":
             king_bucketed_psts.append(these_psts)
         else:
-            raise ValueError(f"Unrecognized value: {stage=}")
+            raise ValueError(f"Unrecognized value: {dataset_type=}")
     return king_bucketed_psts
 
 ###############################################
@@ -181,16 +181,16 @@ def get_continuous_tensor_(features: list[ContinuousFeature]):
     return result
 
 @functools.cache
-def get_continuous_tensor(stage : str = "all"):
+def get_continuous_tensor(dataset_type : str = "all"):
     continuous_tensor = get_continuous_tensor_(CONTINUOUS_FUNCTIONS)
-    if stage == "train":
+    if dataset_type == "train":
         return continuous_tensor[:TRAINING_FENS,:]
-    elif stage == "val":
+    elif dataset_type == "val":
         return continuous_tensor[TRAINING_FENS:,:]
-    elif stage == "all":
+    elif dataset_type == "all":
         return continuous_tensor
     else:
-        raise ValueError(f"Unrecognized value: {stage=}")
+        raise ValueError(f"Unrecognized value: {dataset_type=}")
 
 ###################################
 #### Initialization of tensors ####
@@ -604,10 +604,11 @@ def overwrite_all_hashes():
     overwrite_minirun_hashes()
 
 def print_tensor_shapes():
-    print(f"Embeddings shapes: {[t.shape for t in get_embeddings()]}")
-    print(f"Continuous tensor shape: {get_continuous_tensor().shape}")
-    print(f"Results tensor shape: {get_results().shape}")
-    print(f"Phases tensor shape: {get_phases().shape}")
+    dataset_types = ["train", "val", "all"]
+    print(f"Embeddings shapes: {[f"{dataset_type}: {t.shape}" for t in get_embeddings() for dataset_type in dataset_types]}")
+    print(f"Continuous tensor shape: \n{ {dataset_type : get_continuous_tensor(dataset_type).shape for dataset_type in dataset_types} }")
+    print(f"Results tensor shape: \n{ {dataset_type : get_results(dataset_type).shape for dataset_type in dataset_types} }")
+    print(f"Phases tensor shape: \n{ {dataset_type : get_phases(dataset_type).shape for dataset_type in dataset_types} }")
 
 def print_tensor_dtypes():
     print(f"Embeddings dtypes: {[t.dtype for t in get_embeddings()]}")
