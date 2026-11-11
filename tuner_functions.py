@@ -291,7 +291,8 @@ def get_model(
     max_epochs = 3200, 
     verbose = True,
     run_data : dict = {},
-    l2_lambda = 0.01
+    l2_lambda = 0.01,
+    base_lr = 1e-3
 ):
     # 1. Random stuff we need
     t0 = time.time()
@@ -303,15 +304,20 @@ def get_model(
     run_data["loss"] = []
     run_data["bce_loss"] = []
     run_data["max_delta"] = []
+
+    lr = base_lr * (SCALING_TERM / 24) ** 2
+    # as established before, weights are SCALING_TERM / 24 times bigger than they "should" be
+    # Gradients wrt weights are SCALING_TERM / 24 times smaller than they "should" be e.g. changing a pawn weight from 1 to 2 changes the loss a lot, not so much if you change the pawn weight from 100 to 101
+    # Also the gradients need to be SCALING_TERM / 24 times bigger than normal to move weights the "same" amount
     
     # 2. Optimizer, loss function, closure for LBFGS
     loss_function = nn.BCELoss()
     if optimizer_str == "lbfgs":
         optimizer = torch.optim.LBFGS(model.parameters())
     elif optimizer_str == "adam":
-        optimizer = torch.optim.Adam(model.parameters(), lr = 10)
+        optimizer = torch.optim.Adam(model.parameters(), lr = lr)
     elif optimizer_str == "sgd":
-        optimizer = torch.optim.SGD(model.parameters(), lr = 10)
+        optimizer = torch.optim.SGD(model.parameters(), lr = lr)
     else:
         assert False # Optimizer must be "lbfgs" or "adam" or "sgd"
     
@@ -766,6 +772,8 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    get_model(optimizer="adam")
+    run_data = {}  
+    get_model(optimizer="adam", run_data = run_data)
+    graph_loss(run_data=run_data, title = "adam on 30,000 samples")
     exit(0)
     sys.exit(main())
