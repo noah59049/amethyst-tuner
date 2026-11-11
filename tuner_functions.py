@@ -353,6 +353,7 @@ def get_model(
     # as established before, weights are SCALING_TERM / 24 times bigger than they "should" be
     # Gradients wrt weights are SCALING_TERM / 24 times smaller than they "should" be e.g. changing a pawn weight from 1 to 2 changes the loss a lot, not so much if you change the pawn weight from 100 to 101
     # Also the gradients need to be SCALING_TERM / 24 times bigger than normal to move weights the "same" amount
+    # TODO: Wait, this might be wrong for adam.
     
     # 2. Optimizer, loss function, closure for LBFGS
     loss_function = nn.BCELoss()
