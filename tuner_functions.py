@@ -550,12 +550,16 @@ def sha256torch(x):
 
 def get_ctypes_hashes():
     hashes = [
-        sha256torch(x) for x in get_embeddings()
+        sha256torch(x) for x in get_embeddings("train")
     ] + \
     [
-        sha256torch(get_continuous_tensor()),
-        sha256torch(get_results()),
-        sha256torch(get_phases()),
+        sha256torch(x) for x in get_embeddings("val")
+    ] + \
+    [
+        sha256torch(x) for x in get_embeddings("all")
+    ] + \
+    [
+        sha256torch(func(dataset_type)) for dataset_type in DATASET_TYPES for func in [get_results, get_phases, get_embeddings]
     ]
     hashes_dict = {"hashes":hashes}
     return hashes_dict
@@ -850,8 +854,8 @@ def main():
     # model_forward_walkthrough()
     # print_huge_l2_run()
     initialize_tensors()
-    print_tensor_shapes()
-    # check_all_hashes()
+    # print_tensor_shapes()
+    check_all_hashes()
     # overwrite_all_hashes()
     # run_all_tests()
     return 0
