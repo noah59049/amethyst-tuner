@@ -448,18 +448,16 @@ def save_eval_to_file(model, filename):
     file.close()
 
 def compare_loss_graph(
-    loss1, 
-    loss2,
-    loss1_name : str = "loss1",
-    loss2_name : str = "loss2",
+    losses : list,
+    loss_labels : list,
     title : str = "Loss",
     show : bool = True,
     path : str = "" # If path is not the empty
 ):
     # Code adapted from https://www.geeksforgeeks.org/machine-learning/l1l2-regularization-in-pytorch/
     plt.figure(figsize=(10, 5))
-    plt.plot(range(1, len(loss1) + 1), loss1, label = loss1_name)
-    plt.plot(range(1, len(loss2) + 1), loss2, label = loss2_name)
+    for loss, label in zip(losses, loss_labels):
+        plt.plot(range(1, len(loss) + 1), loss, label = label)
 
     # Source: https://stackoverflow.com/questions/26337493/combine-multiple-line-labels-in-legend
     handles, labels = plt.gca().get_legend_handles_labels()
@@ -479,10 +477,8 @@ def compare_loss_graph(
 
 def run_data_loss_graph(run_data: dict, title = "Loss", **kwargs):
     compare_loss_graph(
-        run_data["bce_loss"],
-        run_data["loss"],
-        "bce_loss",
-        "loss",
+        [run_data["bce_loss"], run_data["loss"]],
+        ["bce_loss", "loss"],
         **kwargs
     )
 
