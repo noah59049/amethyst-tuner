@@ -395,9 +395,9 @@ def get_model(
     model.round_weights()
     return model
 
-#########################################
-#### Printing weights, saving evals  ####
-#########################################
+########################################################
+#### Printing weights, saving evals, graphing loss  ####
+########################################################
 
 eval_t_name = "packed_eval_t"
 def print_king_bucketed_psts(model: Tuner):
