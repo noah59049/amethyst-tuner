@@ -447,7 +447,7 @@ def save_eval_to_file(model, filename):
     print(f"len(evals) is {len(evals)}")
     file.close()
 
-def graph_loss_(
+def compare_loss_graph(
     loss1, 
     loss2,
     loss1_name : str = "loss1",
@@ -477,8 +477,8 @@ def graph_loss_(
     if show:
         plt.show()
 
-def graph_loss(run_data: dict, title = "Loss", **kwargs):
-    graph_loss_(
+def run_data_loss_graph(run_data: dict, title = "Loss", **kwargs):
+    compare_loss_graph(
         run_data["bce_loss"],
         run_data["loss"],
         "bce_loss",
@@ -801,6 +801,6 @@ def main():
 if __name__ == "__main__":
     run_data = {}  
     get_model(optimizer="adam", run_data = run_data, max_epochs=320)
-    graph_loss(run_data=run_data, title = "adam on 30,000 samples")
+    run_data_loss_graph(run_data=run_data, title = "adam on 30,000 samples")
     exit(0)
     sys.exit(main())
