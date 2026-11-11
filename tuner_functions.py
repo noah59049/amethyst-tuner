@@ -40,6 +40,7 @@ TRAINING_FENS = math.ceil(FENS_TO_KEEP * (1 - VALIDATION_PERCENT / 100))
 
 @functools.cache
 def get_results(dataset_type : str = "all"):
+    # I could optimize this not to calculate 3 different times for "train", "val", and "all", but it's so fast it doesn't matter
     results = (c_float * FENS_TO_KEEP)()
     libtuner.getResults(results,
                        c_int(FENS_TO_KEEP))
@@ -56,6 +57,7 @@ def get_results(dataset_type : str = "all"):
 
 @functools.cache
 def get_phases(dataset_type : str = "all"):
+    # I could optimize this not to calculate 3 different times for "train", "val", and "all", but it's so fast it doesn't matter
     phases = (c_int * FENS_TO_KEEP)()
     libtuner.getPhases(phases,
                        c_int(FENS_TO_KEEP))
@@ -127,11 +129,14 @@ def get_king_bucketed_psts(side, piece):
     return psts
 
 @functools.cache
+def get_stacked_king_bucketed_psts(piece):
+    return torch.stack([get_king_bucketed_psts(side,piece) for side in (0,1)])
+
+@functools.cache
 def get_embeddings(dataset_type : str = "all"):
     king_bucketed_psts = []
     for piece in range(6):
-        these_psts_ = [get_king_bucketed_psts(side,piece) for side in (0,1)]
-        these_psts = torch.stack(these_psts_)
+        these_psts = get_stacked_king_bucketed_psts(piece)
         if dataset_type == "train":
             king_bucketed_psts.append(these_psts[:,:TRAINING_FENS,:])
         elif dataset_type == "val":
@@ -182,13 +187,12 @@ def get_continuous_tensor_(features: list[ContinuousFeature]):
 
 @functools.cache
 def get_continuous_tensor(dataset_type : str = "all"):
-    continuous_tensor = get_continuous_tensor_(CONTINUOUS_FUNCTIONS)
-    if dataset_type == "train":
-        return continuous_tensor[:TRAINING_FENS,:]
+    if dataset_type == "all":
+        return get_continuous_tensor_(CONTINUOUS_FUNCTIONS)
+    elif dataset_type == "train":
+        return get_continuous_tensor(dataset_type = "all")[:TRAINING_FENS,:]
     elif dataset_type == "val":
-        return continuous_tensor[TRAINING_FENS:,:]
-    elif dataset_type == "all":
-        return continuous_tensor
+        return get_continuous_tensor(dataset_type = "all")[TRAINING_FENS:,:]
     else:
         raise ValueError(f"Unrecognized value: {dataset_type=}")
 
