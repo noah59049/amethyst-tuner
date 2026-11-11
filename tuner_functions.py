@@ -46,9 +46,9 @@ def get_results(stage : str = "all"):
     results = np.ctypeslib.as_array(results, shape = (FENS_TO_KEEP,))
     results = torch.tensor(results)
     if stage == "train":
-        return results[:TRAINING_FENS,:]
+        return results[:TRAINING_FENS]
     elif stage == "val":
-        return results[TRAINING_FENS:,:]
+        return results[TRAINING_FENS:]
     elif stage == "all":
         return results
     else:
@@ -333,6 +333,8 @@ def get_model(
     run_data["loss"] = []
     run_data["bce_loss"] = []
     run_data["max_delta"] = []
+    if VALIDATION_PERCENT > 0:
+        run_data["val_loss"] = []
 
     lr = base_lr * (SCALING_TERM / 24) ** 2
     # as established before, weights are SCALING_TERM / 24 times bigger than they "should" be
@@ -403,7 +405,14 @@ def get_model(
             max_delta = get_max_delta(previous_params, current_params)
             previous_params = current_params
 
+        if VALIDATION_PERCENT > 0:
+            with torch.no_grad():
+                y_pred_val = model(get_phases("val"), get_continuous_tensor("val"), get_embeddings("val"))
+                val_loss = loss_function(y_pred_val, get_results("val")).item()
+
         message = f"epoch {epoch}; t={int(t1-t0)}; bce_loss={bce_loss:.4f}; loss={loss.item():.4f}"
+        if VALIDATION_PERCENT > 0:
+            message += f"; {val_loss=:.4f}"
         if check_max_delta:
             message += f"; max(∆w) = {max_delta:.4f}"
         if verbose:
@@ -414,6 +423,8 @@ def get_model(
         run_data["bce_loss"].append(bce_loss)
         run_data["loss"].append(loss.item())
         run_data["max_delta"].append(max_delta)
+        if VALIDATION_PERCENT > 0:
+            run_data["val_loss"].append(val_loss)
 
         # 4D. Stopping criteria
         # If none of the params have changed more than 0.5 since last time we checked, we break out of the loop.
