@@ -54,14 +54,12 @@ def get_phases():
     phases = torch.transpose(phases, 0, 1).float()
     return phases
 
-@functools.cache # I don't think we really need this
 def get_king_squares(side):
     kingSquares = (c_int * FENS_TO_KEEP)()
     libtuner.getKingSquares(c_int(side), kingSquares, c_int(FENS_TO_KEEP))
     kingSquares = np.ctypeslib.as_array(kingSquares, shape=(FENS_TO_KEEP,))
     return kingSquares.reshape(-1,1)
 
-@functools.cache 
 def get_mobility(side):
     mobility = (c_int * (6 * FENS_TO_KEEP))()
     libtuner.getMobility(c_int(side), mobility, c_int(FENS_TO_KEEP))
@@ -69,7 +67,6 @@ def get_mobility(side):
     return mobility.reshape(-1,6)
     # We will convert to torch tensor and to float when we stack all the tensors together
 
-@functools.cache
 def get_psts(side, piece):
     maxPieces = [8,2,2,2,2,1][piece]
     psts = (c_int * (maxPieces * FENS_TO_KEEP))()
@@ -99,7 +96,6 @@ BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
 
 NUM_KING_BUCKETS = 2
 
-@functools.cache
 def get_king_bucketed_psts(side, piece):
     psts = get_psts(side, piece)
     king_squares = get_king_squares(side).reshape(-1)
