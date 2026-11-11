@@ -206,7 +206,6 @@ def get_continuous_tensor(dataset_type : str = "all"):
 ###################################
 
 def initialize_tensors():
-    dataset_types = ["train", "val", "all"]
     t0 = time.time()
     for dataset_type in dataset_types:
         get_embeddings(dataset_type)
