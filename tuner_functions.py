@@ -15,6 +15,19 @@ import hashlib
 import json
 import matplotlib.pyplot as plt
 
+###################
+#### Constants ####
+###################
+
+FENS_TO_KEEP = 30000 if __name__ == "__main__" else 7153281
+# Max possible value for FENS_TO_KEEP is 7153281 for Noah.epd
+# Higher values will give an error because we don't have enough fens
+# Set to something like 100000 for debugging purposes
+
+VALIDATION_PERCENT = 10 if __name__ == "__main__" else 0 # Don't mess with the training runs yet, I guess
+TRAINING_FENS = math.ceil(FENS_TO_KEEP * (1 - VALIDATION_PERCENT / 100))
+dataset_types = ["train", "val", "all"]
+
 ##################################
 #### Functions defined in C++ ####
 ##################################
@@ -29,14 +42,6 @@ libtuner.getPhases.argtypes = [POINTER(c_int), c_int]
 libtuner.getKingSquares.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
-
-FENS_TO_KEEP = 30000 if __name__ == "__main__" else 7153281
-# Max possible value for FENS_TO_KEEP is 7153281 for Noah.epd
-# Higher values will give an error because we don't have enough fens
-# Set to something like 100000 for debugging purposes
-
-VALIDATION_PERCENT = 10 if __name__ == "__main__" else 0 # Don't mess with the training runs yet, I guess
-TRAINING_FENS = math.ceil(FENS_TO_KEEP * (1 - VALIDATION_PERCENT / 100))
 
 @functools.cache
 def get_results(dataset_type : str = "all"):
@@ -613,7 +618,6 @@ def overwrite_all_hashes():
     overwrite_minirun_hashes()
 
 def print_tensor_shapes():
-    dataset_types = ["train", "val", "all"]
     print(f"Embeddings shapes: {[[f"{dataset_type}: {t.shape}" for t in get_embeddings(dataset_type)] for dataset_type in dataset_types]}")
     print(f"Continuous tensor shape: \n{ {dataset_type : get_continuous_tensor(dataset_type).shape for dataset_type in dataset_types} }")
     print(f"Results tensor shape: \n{ {dataset_type : get_results(dataset_type).shape for dataset_type in dataset_types} }")
