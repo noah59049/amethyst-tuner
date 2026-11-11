@@ -605,7 +605,7 @@ def overwrite_all_hashes():
 
 def print_tensor_shapes():
     dataset_types = ["train", "val", "all"]
-    print(f"Embeddings shapes: {[f"{dataset_type}: {t.shape}" for t in get_embeddings() for dataset_type in dataset_types]}")
+    print(f"Embeddings shapes: {[[f"{dataset_type}: {t.shape}" for t in get_embeddings(dataset_type)] for dataset_type in dataset_types]}")
     print(f"Continuous tensor shape: \n{ {dataset_type : get_continuous_tensor(dataset_type).shape for dataset_type in dataset_types} }")
     print(f"Results tensor shape: \n{ {dataset_type : get_results(dataset_type).shape for dataset_type in dataset_types} }")
     print(f"Phases tensor shape: \n{ {dataset_type : get_phases(dataset_type).shape for dataset_type in dataset_types} }")
