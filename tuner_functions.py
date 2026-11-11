@@ -451,13 +451,14 @@ def compare_loss_graph(
     losses : list,
     loss_labels : list,
     title : str = "Loss",
+    start_epoch = 1, # If this is, say, 200, we will start our graph at epoch 200
     show : bool = True,
-    path : str = "" # If path is not the empty
+    path : str = "" # If path is not the empty string, will save the file to that path
 ):
     # Code adapted from https://www.geeksforgeeks.org/machine-learning/l1l2-regularization-in-pytorch/
     plt.figure(figsize=(10, 5))
     for loss, label in zip(losses, loss_labels):
-        plt.plot(range(1, len(loss) + 1), loss, label = label)
+        plt.plot(range(start_epoch, len(loss) + 1), loss[start_epoch - 1:], label = label)
 
     # Source: https://stackoverflow.com/questions/26337493/combine-multiple-line-labels-in-legend
     handles, labels = plt.gca().get_legend_handles_labels()
@@ -805,7 +806,8 @@ if __name__ == "__main__":
         losses = [run_data_normal["bce_loss"], run_data_low_lr["bce_loss"]],
         loss_labels = ["LR=1e-3", "LR=e3-5"],
         title = "Loss for different learn rates, ADAM",
-        path = "graphs/compare_loss.png"
+        path = "graphs/compare_loss.png",
+        start_epoch=200
     )
 
     exit(0)
