@@ -26,7 +26,7 @@ FENS_TO_KEEP = 30000 if __name__ == "__main__" else 7153281
 
 VALIDATION_PERCENT = 10 if __name__ == "__main__" else 0 # Don't mess with the training runs yet, I guess
 TRAINING_FENS = math.ceil(FENS_TO_KEEP * (1 - VALIDATION_PERCENT / 100))
-dataset_types = ["train", "val", "all"]
+DATASET_TYPES = ["train", "val", "all"]
 
 ##################################
 #### Functions defined in C++ ####
@@ -207,26 +207,26 @@ def get_continuous_tensor(dataset_type : str = "all"):
 
 def initialize_tensors():
     t0 = time.time()
-    for dataset_type in dataset_types:
+    for dataset_type in DATASET_TYPES:
         get_embeddings(dataset_type)
     t1 = time.time()
     print(f"Made embeddings in {t1-t0:.2f} seconds")
 
     t0 = time.time()
-    for dataset_type in dataset_types:
+    for dataset_type in DATASET_TYPES:
         get_continuous_tensor(dataset_type)
     t1 = time.time()
     print(f"Made continuous tensor in {t1-t0:.2f} seconds")
 
 
     t0 = time.time()
-    for dataset_type in dataset_types:
+    for dataset_type in DATASET_TYPES:
         get_results(dataset_type)
     t1 = time.time()
     print(f"Made results tensor in {t1-t0:.2f} seconds")
 
     t0 = time.time()
-    for dataset_type in dataset_types:
+    for dataset_type in DATASET_TYPES:
         get_phases(dataset_type)
     t1 = time.time()
     print(f"Made phase tensor in {t1-t0:.2f} seconds")
@@ -617,10 +617,10 @@ def overwrite_all_hashes():
     overwrite_minirun_hashes()
 
 def print_tensor_shapes():
-    print(f"Embeddings shapes: {[[f"{dataset_type}: {t.shape}" for t in get_embeddings(dataset_type)] for dataset_type in dataset_types]}")
-    print(f"Continuous tensor shape: \n{ {dataset_type : get_continuous_tensor(dataset_type).shape for dataset_type in dataset_types} }")
-    print(f"Results tensor shape: \n{ {dataset_type : get_results(dataset_type).shape for dataset_type in dataset_types} }")
-    print(f"Phases tensor shape: \n{ {dataset_type : get_phases(dataset_type).shape for dataset_type in dataset_types} }")
+    print(f"Embeddings shapes: {[[f"{dataset_type}: {t.shape}" for t in get_embeddings(dataset_type)] for dataset_type in DATASET_TYPES]}")
+    print(f"Continuous tensor shape: \n{ {dataset_type : get_continuous_tensor(dataset_type).shape for dataset_type in DATASET_TYPES} }")
+    print(f"Results tensor shape: \n{ {dataset_type : get_results(dataset_type).shape for dataset_type in DATASET_TYPES} }")
+    print(f"Phases tensor shape: \n{ {dataset_type : get_phases(dataset_type).shape for dataset_type in DATASET_TYPES} }")
 
 def print_tensor_dtypes():
     print(f"Embeddings dtypes: {[t.dtype for t in get_embeddings()]}")
