@@ -838,10 +838,10 @@ def main():
     # model_forward_walkthrough()
     # print_huge_l2_run()
     initialize_tensors()
-    # print_tensor_shapes()
-    check_all_hashes()
+    print_tensor_shapes()
+    # check_all_hashes()
     # overwrite_all_hashes()
-    run_all_tests()
+    # run_all_tests()
     return 0
 
 if __name__ == "__main__":
