@@ -555,6 +555,14 @@ def check_minirun_hashes():
         print("--- Hashes from calculation ---")
         print(calculated_hashes)
 
+def check_all_hashes():
+    check_ctypes_hashes()
+    check_minirun_hashes()
+
+def overwrite_all_hashes():
+    overwrite_ctypes_hashes()
+    overwrite_minirun_hashes()
+
 def print_tensor_shapes():
     print(f"Embeddings shapes: {[t.shape for t in get_embeddings()]}")
     print(f"Continuous tensor shape: {get_continuous_tensor().shape}")
