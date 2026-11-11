@@ -873,6 +873,21 @@ def toy_lr_comparison_graph():
         start_epoch=200
     )
 
+def toy_l2_comparison_graph():
+    run_data_normal = {}  
+    get_model(optimizer="adam", run_data = run_data_normal, max_epochs=1000, base_lr=3e-5)
+
+    run_data_low_l2 = {}
+    get_model(optimizer="adam", run_data = run_data_low_l2, max_epochs=1000, base_lr=3e-5, l2_lambda=0)
+    
+    compare_loss_graph(
+        losses = [run_data_normal["val_loss"], run_data_low_l2["val_loss"]],
+        loss_labels = ["LR=1e-3", "LR=e3-5"],
+        title = "Loss for different learn rates, ADAM",
+        path = "graphs/compare_loss.png",
+        start_epoch=200
+    )
+
 
 def main():
     # model_forward_walkthrough()
