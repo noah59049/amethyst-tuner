@@ -863,7 +863,7 @@ def main():
     # print_tensor_shapes()
     check_all_hashes()
     # overwrite_all_hashes()
-    # run_all_tests()
+    run_all_tests()
     return 0
 
 if __name__ == "__main__":
