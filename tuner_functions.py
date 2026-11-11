@@ -869,22 +869,22 @@ def toy_lr_comparison_graph():
         losses = [run_data_normal["val_loss"], run_data_low_lr["val_loss"]],
         loss_labels = ["LR=1e-3", "LR=e3-5"],
         title = "Loss for different learn rates, ADAM",
-        path = "graphs/compare_loss.png",
+        path = "graphs/compare_lr.png",
         start_epoch=200
     )
 
 def toy_l2_comparison_graph():
     run_data_normal = {}  
-    get_model(optimizer="adam", run_data = run_data_normal, max_epochs=1000, base_lr=3e-5)
+    get_model(optimizer="adam", run_data = run_data_normal, max_epochs=1000, base_lr=3e-5, l2_lambda=0.01)
 
     run_data_low_l2 = {}
     get_model(optimizer="adam", run_data = run_data_low_l2, max_epochs=1000, base_lr=3e-5, l2_lambda=0)
     
     compare_loss_graph(
         losses = [run_data_normal["val_loss"], run_data_low_l2["val_loss"]],
-        loss_labels = ["LR=1e-3", "LR=e3-5"],
+        loss_labels = ["lambda=1e-2", "lambda=0"],
         title = "Loss for different learn rates, ADAM",
-        path = "graphs/compare_loss.png",
+        path = "graphs/compare_l2.png",
         start_epoch=200
     )
 
@@ -896,7 +896,8 @@ def main():
     # print_tensor_shapes()
     check_all_hashes()
     # overwrite_all_hashes()
-    run_all_tests()
+    # run_all_tests()
+    toy_l2_comparison_graph()
     return 0
 
 if __name__ == "__main__":
