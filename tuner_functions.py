@@ -12,6 +12,7 @@ import functools
 import io
 import hashlib
 import json
+import matplotlib.pyplot as plt
 
 ##################################
 #### Functions defined in C++ ####
@@ -440,6 +441,18 @@ def save_eval_to_file(model, filename):
     print(f"len(evals) is {len(evals)}")
     file.close()
 
+def graph_loss(run_data: dict, title = "Loss"):
+    # Code adapted from https://www.geeksforgeeks.org/machine-learning/l1l2-regularization-in-pytorch/
+    plt.figure(figsize=(10, 5))
+    plt.plot(range(1, len(run_data["loss"]) + 1), run_data["loss"])
+    plt.plot(range(1, len(run_data["bce_loss"]) + 1), run_data["bce_loss"])
+    plt.title(title)
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.grid(True)
+    plt.show()
+
+
 ###############
 #### Tests ####
 ###############
@@ -753,4 +766,6 @@ def main():
     return 0
 
 if __name__ == "__main__":
+    get_model(optimizer="adam")
+    exit(0)
     sys.exit(main())
