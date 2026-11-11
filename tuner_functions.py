@@ -692,6 +692,7 @@ def ctypes_shapes_test() -> bool:
     if passed:
         print("Passed ctypes tensor shapes test")
     return passed
+    # TODO: Include dataset types maybe
 
 def ctypes_dtypes_test() -> bool:
     passed = True
@@ -702,6 +703,7 @@ def ctypes_dtypes_test() -> bool:
             print(f"FAILED ctypes tensor dtypes test: king bucketed PSTs[{i}] expected dtype {torch.int32} but has type {tensor.dtype}")
             passed = False
 
+    # 2. Everything else
     for name, tensor in zip(
         ["continuous", "results", "phases"],
         [get_continuous_tensor(), get_results(), get_phases()]
