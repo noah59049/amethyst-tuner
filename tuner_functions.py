@@ -3,6 +3,7 @@
 #################
 import sys
 import time
+import math
 import numpy as np
 import torch
 import torch.nn as nn
@@ -34,17 +35,27 @@ FENS_TO_KEEP = 30000 if __name__ == "__main__" else 7153281
 # Higher values will give an error because we don't have enough fens
 # Set to something like 100000 for debugging purposes
 
+VALIDATION_PERCENT = 10 if __name__ == "__main__" else 0 # Don't mess with the training runs yet, I guess
+TRAINING_FENS = math.ceil(FENS_TO_KEEP * (1 - VALIDATION_PERCENT / 100))
+
 @functools.cache
-def get_results():
+def get_results(stage : str = "all"):
     results = (c_float * FENS_TO_KEEP)()
     libtuner.getResults(results,
                        c_int(FENS_TO_KEEP))
     results = np.ctypeslib.as_array(results, shape = (FENS_TO_KEEP,))
     results = torch.tensor(results)
-    return results
+    if stage == "train":
+        return results[:TRAINING_FENS,:]
+    elif stage == "val":
+        return results[TRAINING_FENS:,:]
+    elif stage == "all":
+        return results
+    else:
+        raise ValueError(f"Unrecognized value: {stage=}")
 
 @functools.cache
-def get_phases():
+def get_phases(stage : str = "all"):
     phases = (c_int * FENS_TO_KEEP)()
     libtuner.getPhases(phases,
                        c_int(FENS_TO_KEEP))
@@ -52,7 +63,14 @@ def get_phases():
     phases = torch.tensor(phases)
     phases = torch.stack([phases, 24 - phases])
     phases = torch.transpose(phases, 0, 1).float()
-    return phases
+    if stage == "train":
+        return phases[:TRAINING_FENS,:]
+    elif stage == "val":
+        return phases[TRAINING_FENS:,:]
+    elif stage == "all":
+        return phases
+    else:
+        raise ValueError(f"Unrecognized value: {stage=}")
 
 def get_king_squares(side):
     kingSquares = (c_int * FENS_TO_KEEP)()
@@ -109,12 +127,19 @@ def get_king_bucketed_psts(side, piece):
     return psts
 
 @functools.cache
-def get_embeddings():
+def get_embeddings(stage : str = "all"):
     king_bucketed_psts = []
     for piece in range(6):
         these_psts_ = [get_king_bucketed_psts(side,piece) for side in (0,1)]
         these_psts = torch.stack(these_psts_)
-        king_bucketed_psts.append(these_psts)
+        if stage == "train":
+            king_bucketed_psts.append(these_psts[:,:TRAINING_FENS,:])
+        elif stage == "val":
+            king_bucketed_psts.append(these_psts[:,TRAINING_FENS:,:])
+        elif stage == "all":
+            king_bucketed_psts.append(these_psts)
+        else:
+            raise ValueError(f"Unrecognized value: {stage=}")
     return king_bucketed_psts
 
 ###############################################
@@ -156,8 +181,16 @@ def get_continuous_tensor_(features: list[ContinuousFeature]):
     return result
 
 @functools.cache
-def get_continuous_tensor():
-    return get_continuous_tensor_(CONTINUOUS_FUNCTIONS)
+def get_continuous_tensor(stage : str = "all"):
+    continuous_tensor = get_continuous_tensor_(CONTINUOUS_FUNCTIONS)
+    if stage == "train":
+        return continuous_tensor[:TRAINING_FENS,:]
+    elif stage == "val":
+        return continuous_tensor[TRAINING_FENS:,:]
+    elif stage == "all":
+        return continuous_tensor
+    else:
+        raise ValueError(f"Unrecognized value: {stage=}")
 
 ###################################
 #### Initialization of tensors ####
