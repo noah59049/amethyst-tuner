@@ -5,3 +5,4 @@
 *.pyc
 ctypes_hashes.txt
 minirun_hashes.txt
+graphs
