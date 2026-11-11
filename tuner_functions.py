@@ -447,17 +447,44 @@ def save_eval_to_file(model, filename):
     print(f"len(evals) is {len(evals)}")
     file.close()
 
-def graph_loss(run_data: dict, title = "Loss"):
+def graph_loss_(
+    loss1, 
+    loss2,
+    loss1_name : str = "loss1",
+    loss2_name : str = "loss2",
+    title : str = "Loss",
+    show : bool = True,
+    path : str = "" # If path is not the empty
+):
     # Code adapted from https://www.geeksforgeeks.org/machine-learning/l1l2-regularization-in-pytorch/
     plt.figure(figsize=(10, 5))
-    plt.plot(range(1, len(run_data["loss"]) + 1), run_data["loss"])
-    plt.plot(range(1, len(run_data["bce_loss"]) + 1), run_data["bce_loss"])
+    plt.plot(range(1, len(loss1) + 1), loss1, label = loss1_name)
+    plt.plot(range(1, len(loss2) + 1), loss2, label = loss2_name)
+
+    # Source: https://stackoverflow.com/questions/26337493/combine-multiple-line-labels-in-legend
+    handles, labels = plt.gca().get_legend_handles_labels()
+    labels, ids = np.unique(labels, return_index=True)
+    handles = [handles[i] for i in ids]
+    plt.legend(handles, labels, loc='best')
+    # End the part that's from stack overflow
+
     plt.title(title)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.grid(True)
-    plt.show()
+    if path:
+        plt.savefig(path)
+    if show:
+        plt.show()
 
+def graph_loss(run_data: dict, title = "Loss", **kwargs):
+    graph_loss_(
+        run_data["bce_loss"],
+        run_data["loss"],
+        "bce_loss",
+        "loss",
+        **kwargs
+    )
 
 ###############
 #### Tests ####
@@ -773,7 +800,7 @@ def main():
 
 if __name__ == "__main__":
     run_data = {}  
-    get_model(optimizer="adam", run_data = run_data)
+    get_model(optimizer="adam", run_data = run_data, max_epochs=320)
     graph_loss(run_data=run_data, title = "adam on 30,000 samples")
     exit(0)
     sys.exit(main())
