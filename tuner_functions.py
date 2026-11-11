@@ -197,24 +197,29 @@ def get_continuous_tensor(dataset_type : str = "all"):
 ###################################
 
 def initialize_tensors():
+    dataset_types = ["train", "val", "all"]
     t0 = time.time()
-    ONE_HOT_TENSORS = get_embeddings()
+    for dataset_type in dataset_types:
+        get_embeddings(dataset_type)
     t1 = time.time()
     print(f"Made embeddings in {t1-t0:.2f} seconds")
 
     t0 = time.time()
-    CONTINUOUS_TENSOR = get_continuous_tensor()
+    for dataset_type in dataset_types:
+        get_continuous_tensor(dataset_type)
     t1 = time.time()
     print(f"Made continuous tensor in {t1-t0:.2f} seconds")
 
 
     t0 = time.time()
-    RESULTS = get_results()
+    for dataset_type in dataset_types:
+        get_results(dataset_type)
     t1 = time.time()
     print(f"Made results tensor in {t1-t0:.2f} seconds")
 
     t0 = time.time()
-    PHASES = get_phases()
+    for dataset_type in dataset_types:
+        get_phases(dataset_type)
     t1 = time.time()
     print(f"Made phase tensor in {t1-t0:.2f} seconds")
 
