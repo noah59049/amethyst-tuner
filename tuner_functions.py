@@ -794,12 +794,12 @@ def model_forward_walkthrough():
     # This function seems slightly overkill
 
 def main():
-    check_ctypes_hashes()
-    check_minirun_hashes()
-    model_forward_walkthrough()
-    print_huge_l2_run()
+    # model_forward_walkthrough()
+    # print_huge_l2_run()
     initialize_tensors()
-    print_tensor_shapes()
+    # print_tensor_shapes()
+    check_all_hashes()
+    # overwrite_all_hashes()
     run_all_tests()
     return 0
 
