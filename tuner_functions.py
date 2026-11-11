@@ -361,15 +361,20 @@ def get_model(
     if VALIDATION_PERCENT > 0:
         run_data["val_loss"] = []
 
-    lr = base_lr * (SCALING_TERM / 24) ** 2
+    if optimizer == "sgd":
+        lr = base_lr * (SCALING_TERM / 24) ** 2
+    elif optimizer == "adam":
+        lr = base_lr * (SCALING_TERM / 24)
     # as established before, weights are SCALING_TERM / 24 times bigger than they "should" be
     # Gradients wrt weights are SCALING_TERM / 24 times smaller than they "should" be e.g. changing a pawn weight from 1 to 2 changes the loss a lot, not so much if you change the pawn weight from 100 to 101
     # Also the gradients need to be SCALING_TERM / 24 times bigger than normal to move weights the "same" amount
-    # TODO: This is wrong for adam
+    # For sgd:
+    # These combine, so we need lr to be (SCALING_TERM / 24) ** 2 times bigger
     # For adam:
     # Gradients wrt weights are SCALING_TERM / 24 times smaller than they "should" be, yes
     # but step sizes are the same. Step sizes are just mt / sqrt(vt)
     # So making gradients SCALING_TERM / 24 times smaller doesn't actually make the steps any bigger or smaller
+    # So we only need to multiply gradients by SCALING_TERM / 24 once
     
     # 2. Optimizer, loss function, closure for LBFGS
     loss_function = nn.BCELoss()
