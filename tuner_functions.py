@@ -353,8 +353,8 @@ def get_model(
     def closure():
         # This is the closure required for LBFGS
         optimizer.zero_grad()
-        y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
-        loss = loss_function(y_pred, get_results())
+        y_pred = model(get_phases("train"), get_continuous_tensor("train"), get_embeddings("train"))
+        loss = loss_function(y_pred, get_results("train"))
         l2_norm = model.get_weird_l2_norm()
         loss += l2_lambda * l2_norm
         loss.backward()
@@ -369,8 +369,8 @@ def get_model(
     # 4. Start the training loop
     for epoch in range(1, max_epochs + 1):
         # 4A. Forward pass, loss, backpropagation
-        y_pred = model(get_phases(), get_continuous_tensor(), get_embeddings())
-        loss = loss_function(y_pred, get_results())
+        y_pred = model(get_phases("train"), get_continuous_tensor("train"), get_embeddings("train"))
+        loss = loss_function(y_pred, get_results("train"))
         bce_loss = loss.item()
 
         # L2 regularization
