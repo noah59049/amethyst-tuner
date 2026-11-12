@@ -933,7 +933,7 @@ def compare_hyperparameters():
         start_epoch=200
     )
     for label, model in zip(labels, models):
-        print(f"Model {label} has weight variance {model.get_weird_l2_penalty().item():.4f}")
+        print(f"Model {label} has weight variance {model.get_weird_l2_norm().item():.4f}")
 
 def main():
     # model_forward_walkthrough()
