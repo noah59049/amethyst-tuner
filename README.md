@@ -1,0 +1,33 @@
+# amethyst-tuner
+
+This is the tuner for the hand-crafted evaluation of [Amethyst](https://github.com/noah59049/Amethyst).
+
+## Running
+It is necessary to put `libamethyst_tuner.dylib` built from [`hcetuner.cpp`](https://github.com/noah59049/Amethyst/blob/master/hcetuner.cpp) in the main directory of the project.
+
+`tuner_functions.py` contains the functions needed. A sample training run is below, which is intended to be run from a Jupyter notebook that imports `tuner_functions`.
+
+```python
+import tuner_functions
+tuner_functions.initialize_tensors() # Not strictly necessary, but better than doing it on the first epoch
+run_data = {}
+tuner = tuner_functions.get_model(
+    optimizer = "adam",
+    run_data = run_data
+)
+tuner_functions.print_continuous_weights(tuner)
+tuner_functions.print_king_bucketed_psts(tuner)
+save_eval_to_file(tuner, "NoahResults.txt")
+```
+
+This will print out the weights in a format designed for [`hce.cpp`](https://github.com/noah59049/Amethyst/blob/master/hce.cpp). `save_eval_to_file` saves the evals to a file in a format suited for the `runEvalTestSuite` test in [`tests.cpp`](https://github.com/noah59049/Amethyst/blob/master/tests.cpp).
+
+`tuner_functions.py` also contains several tests, and running `python tuner_functions.py` will run the tests.
+
+## Features
+This tuner is, at its core, logistic regression. The eval weights are tuned to maximize the likelihood of the observed results. Some features supported include:
+- Cross entropy loss
+- SGD, Adam, and LBFGS optimizers
+- L2 regularization
+- Variable learn rates
+- Train-test split
