@@ -906,9 +906,9 @@ all_hyperparameters = {
 sample_hyperparameters = {k:all_hyperparameters[k] for k in ["adam_standard", "l2=0", "l2=1e-1", "l2=1e-3", "l2=1e-4", "l2=1e-5", "l2=1e-6"]}
 
 def compare_hyperparameters():
-    run_datas = []
-    labels = []
-    models = []
+    run_datas : list[dict] = []
+    labels : list[str] = []
+    models : list[Tuner] = []
     for label in sample_hyperparameters:
         kwargs = sample_hyperparameters[label].copy()
         kwargs["max_epochs"] = 1500
