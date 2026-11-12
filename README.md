@@ -5,7 +5,7 @@ This is the tuner specifically designed for the hand-crafted evaluation of [Amet
 ## Running
 It is necessary to put `libamethyst_tuner.dylib` built from [`hcetuner.cpp`](https://github.com/noah59049/Amethyst/blob/master/hcetuner.cpp) in the main directory of the project.
 
-It is also necessary to have a data file named `Noah.epd` in the main directory. I use a slightly modified version of [`lichess-big3-resolved.7z`](https://archive.org/details/lichess-big3-resolved.7z). The format is fen \[result\].
+It is also necessary to have a data file named `Noah.epd` in the main directory. I use a slightly modified version of [`lichess-big3-resolved.7z`](https://archive.org/details/lichess-big3-resolved.7z). Each line of the file should be formatted as `fen \[game_result (0.0 for black win, 0.5 for draw, 1.0 for white win)\]` e.g. `r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3 [1.0]`. `
 
 `tuner_functions.py` contains the functions needed. A sample training run is below, which is intended to be run from a Jupyter notebook that imports `tuner_functions`.
 
