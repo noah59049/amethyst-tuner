@@ -863,7 +863,7 @@ def model_forward_walkthrough():
     # print(model.embedding_layers[0].weight[:,1])
     # This function seems slightly overkill
 
-sample_hyperparameters = {
+all_hyperparameters = {
     "adam_standard": {
         "optimizer": "adam",
     },
@@ -887,10 +887,23 @@ sample_hyperparameters = {
         "optimizer": "adam",
         "l2_lambda":1e-3
     },
+    "l2=1e-4": {
+        "optimizer": "adam",
+        "l2_lambda":1e-4
+    },
+    "l2=1e-5": {
+        "optimizer": "adam",
+        "l2_lambda":1e-5
+    },
+    "l2=1e-6": {
+        "optimizer": "adam",
+        "l2_lambda":1e-6
+    },
     "sgd": {
         "optimizer": "sgd"
     }
 }
+sample_hyperparameters = {k:all_hyperparameters[k] for k in ["adam_standard", "l2=0", "l2=1e-1", "l2=1e-3", "l2=1e-4", "l2=1e-5", "l2=1e-6"]}
 
 def compare_hyperparameters():
     run_datas = []
