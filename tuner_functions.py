@@ -863,36 +863,61 @@ def model_forward_walkthrough():
     # print(model.embedding_layers[0].weight[:,1])
     # This function seems slightly overkill
 
-def toy_lr_comparison_graph():
-    run_data_normal = {}  
-    get_model(optimizer="adam", run_data = run_data_normal, max_epochs=1000)
+sample_hyperparameters = {
+    "adam_standard": {
+        "optimizer": "adam",
+    },
+    "lr=1e-4": {
+        "optimizer": "adam",
+        "base_lr": 1e-4
+    },
+    "lr=1e-2": {
+        "optimizer": "adam",
+        "base_lr": 1e-2
+    },
+    "l2=0": {
+        "optimizer": "adam",
+        "l2_lambda":0
+    },
+    "l2=1e-1": {
+        "optimizer": "adam",
+        "l2_lambda":1e-1
+    },
+    "l2=1e-3": {
+        "optimizer": "adam",
+        "l2_lambda":1e-3
+    },
+    "sgd": {
+        "optimizer": "sgd"
+    }
+}
 
-    run_data_low_lr = {}
-    get_model(optimizer="adam", run_data = run_data_low_lr, max_epochs=1000, base_lr=3e-5)
+def compare_hyperparameters():
+    run_datas = []
+    labels = []
+    for label in sample_hyperparameters:
+        kwargs = sample_hyperparameters[label].copy()
+        kwargs["max_epochs"] = 1500
+        run_data = {}
+        kwargs["run_data"] = run_data
+        run_datas.append(run_data)
+        labels.append(label)
+        get_model(**kwargs)
     
     compare_loss_graph(
-        losses = [run_data_normal["val_loss"], run_data_low_lr["val_loss"]],
-        loss_labels = ["LR=1e-3", "LR=e3-5"],
-        title = "Loss for different learn rates, ADAM",
-        path = "graphs/compare_lr.png",
+        losses = [run_data["val_loss"] for run_data in run_datas],
+        loss_labels = labels,
+        title = "Validation Loss",
+        path = "graphs/compare_hyperparameters_val.png",
         start_epoch=200
     )
-
-def toy_l2_comparison_graph():
-    run_data_normal = {}  
-    get_model(optimizer="adam", run_data = run_data_normal, max_epochs=1000, base_lr=3e-5, l2_lambda=0.01)
-
-    run_data_low_l2 = {}
-    get_model(optimizer="adam", run_data = run_data_low_l2, max_epochs=1000, base_lr=3e-5, l2_lambda=0)
-    
     compare_loss_graph(
-        losses = [run_data_normal["val_loss"], run_data_low_l2["val_loss"]],
-        loss_labels = ["lambda=1e-2", "lambda=0"],
-        title = "Loss for different learn rates, ADAM",
-        path = "graphs/compare_l2.png",
+        losses = [run_data["val_loss"] for run_data in run_datas],
+        loss_labels = labels,
+        title = "BCE Train Loss",
+        path = "graphs/compare_hyperparameters_bce.png",
         start_epoch=200
     )
-
 
 def main():
     # model_forward_walkthrough()
@@ -902,7 +927,7 @@ def main():
     check_all_hashes()
     # overwrite_all_hashes()
     # run_all_tests()
-    toy_l2_comparison_graph()
+    compare_hyperparameters()
     return 0
 
 if __name__ == "__main__":
