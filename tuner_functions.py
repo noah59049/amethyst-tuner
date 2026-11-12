@@ -292,7 +292,7 @@ class Tuner(nn.Module):
                 layer.weight.round_()
 
     def get_weird_l2_norm(self): # We only take the L2 norm of embeddings
-        return sum(torch.var(p, axis = 0, correction = 0).sum() for p in self.parameters() if p.shape[1] == 2) / (SCALING_TERM / 24) ** 2
+        return sum(torch.var(p[:-1,:], axis = 0, correction = 0).sum() for p in self.parameters() if p.shape[1] == 2) / (SCALING_TERM / 24) ** 2
         # Instead of taking the linear product of 1-hot tensors and stuff and then a sigmoid,
         # We take the linear product, then multiply by 24 implicity (phases), then divide by SCALING_TERM, then take the sigmoid.
         # Therefore weights need to be SCALING_TERM / 24 times bigger than they would normally be.
