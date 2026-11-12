@@ -1,6 +1,6 @@
 # amethyst-tuner
 
-This is the tuner for the hand-crafted evaluation of [Amethyst](https://github.com/noah59049/Amethyst).
+This is the tuner for the hand-crafted evaluation of [Amethyst](https://github.com/noah59049/Amethyst) using pytorch. The evaluation loss is minimized by gradient descent.
 
 ## Running
 It is necessary to put `libamethyst_tuner.dylib` built from [`hcetuner.cpp`](https://github.com/noah59049/Amethyst/blob/master/hcetuner.cpp) in the main directory of the project.
@@ -26,8 +26,14 @@ This will print out the weights in a format designed for [`hce.cpp`](https://git
 
 ## Features
 This tuner is, at its core, logistic regression. The eval weights are tuned to maximize the likelihood of the observed results. Some features supported include:
+- King bucketed Piece Square Tables (PSTs), mobility evaluation.
 - Cross entropy loss
 - SGD, Adam, and LBFGS optimizers
 - L2 regularization
 - Variable learn rates
 - Train-test split
+- `nn.Embedding` optimizations for PSTs
+- Graphing loss
+
+## How it works
+`libamethyst_tuner.dylib` contains functions for calculating piece-square tables and mobility that would be costly to calculate in Python, but are faster if implemented in C++. `tuner_functions.py` calls those functions from python. It also has functions for creating a tuner, running backpropagation, deciding when to stop training, and printing out eval weights.
