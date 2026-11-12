@@ -908,6 +908,7 @@ sample_hyperparameters = {k:all_hyperparameters[k] for k in ["adam_standard", "l
 def compare_hyperparameters():
     run_datas = []
     labels = []
+    models = []
     for label in sample_hyperparameters:
         kwargs = sample_hyperparameters[label].copy()
         kwargs["max_epochs"] = 1500
@@ -915,7 +916,7 @@ def compare_hyperparameters():
         kwargs["run_data"] = run_data
         run_datas.append(run_data)
         labels.append(label)
-        get_model(**kwargs)
+        models.append(get_model(**kwargs))
     
     compare_loss_graph(
         losses = [run_data["val_loss"] for run_data in run_datas],
@@ -931,6 +932,8 @@ def compare_hyperparameters():
         path = "graphs/compare_hyperparameters_bce.png",
         start_epoch=200
     )
+    for label, model in zip(labels, models):
+        print(f"Model {label} has weight variance {model.get_weird_l2_penalty().item():.4f}")
 
 def main():
     # model_forward_walkthrough()
