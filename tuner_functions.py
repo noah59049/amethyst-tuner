@@ -909,6 +909,10 @@ all_hyperparameters = {
         "optimizer": "adamw",
         "l2_lambda":0
     },
+    "l2=1": {
+        "optimizer": "adamw",
+        "l2_lambda":1
+    },
     "l2=1e-1": {
         "optimizer": "adamw",
         "l2_lambda":1e-1
@@ -933,7 +937,7 @@ all_hyperparameters = {
         "optimizer": "sgd"
     }
 }
-sample_hyperparameters = {k:all_hyperparameters[k] for k in ["adamw_standard", "l2=0", "l2=1e-1", "l2=1e-3", "l2=1e-4", "l2=1e-5", "l2=1e-6"]}
+sample_hyperparameters = {k:all_hyperparameters[k] for k in ["adamw_standard", "l2=1", "l2=1e-1", "l2=1e-3",]}
 
 def compare_hyperparameters():
     run_datas : list[dict] = []
