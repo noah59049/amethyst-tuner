@@ -363,7 +363,7 @@ def get_model(
 
     if optimizer == "sgd":
         lr = base_lr * (SCALING_TERM / 24) ** 2
-    elif optimizer == "adam":
+    elif optimizer in ("adam", "adamw"):
         lr = base_lr * (SCALING_TERM / 24)
     # as established before, weights are SCALING_TERM / 24 times bigger than they "should" be
     # Gradients wrt weights are SCALING_TERM / 24 times smaller than they "should" be e.g. changing a pawn weight from 1 to 2 changes the loss a lot, not so much if you change the pawn weight from 100 to 101
@@ -380,7 +380,7 @@ def get_model(
     loss_function = nn.BCELoss()
     if optimizer_str == "lbfgs":
         optimizer = torch.optim.LBFGS(model.parameters())
-    elif optimizer_str == "adam":
+    elif optimizer_str in ("adam", "adamw"):
         optimizer = torch.optim.Adam(model.parameters(), lr = lr)
     elif optimizer_str == "sgd":
         optimizer = torch.optim.SGD(model.parameters(), lr = lr)
@@ -411,12 +411,27 @@ def get_model(
         bce_loss = loss.item()
 
         # L2 regularization
-        l2_norm = model.get_weird_l2_norm()
-        loss += l2_lambda * l2_norm
-        loss.backward()
+        if optimizer != "adamw":
+            l2_norm = model.get_weird_l2_norm()
+            loss += l2_lambda * l2_norm
+            loss.backward()
 
         if optimizer_str == "lbfgs":
             optimizer.step(closure)
+        elif optimizer == "adamw":
+            optimizer.step()
+            # Weight decay
+            # I'm pretty sure we don't scale this by any power of SCALING_TERM / 24
+            # We decay the weights by, say 1%. And we still do that whether the weights are 0.01 or 100
+            with torch.no_grad():
+                for p in model.parameters():
+                    if p.shape[1] == 2: # aka if p is an embedding layer (hacky solution but I couldn't figure out anything else)
+                        p[:-1,:] -= (p[:-1,:] - p[:-1,:].mean(axis = 0)) * l2_lambda
+                        # decay all PSTs to the mean of that PST, indexed by piece type and phase
+                        # e.g. the weight for a midgame white knight on f3 / black knight on f6 decays towards the mean weight of a knight in the midgame
+                        # the p[:-1,:] part is so that we don't decay the padding index. That needs to stay at 0
+                        # I think we should use 2 * l2_lambda because the derivative of w^2 is 2w, but I think that's not standard convention.
+
         else:
             optimizer.step()
         optimizer.zero_grad()
@@ -669,6 +684,21 @@ def print_huge_l2_run():
     except RuntimeError as e:
         print(f"we got a RuntimeError: {e}")
 
+def print_weight_decay():
+    model = get_model(optimizer="adam", base_lr = 1, max_epochs=10)
+    print_king_bucketed_psts(model)
+    for p in model.parameters():
+        if p.shape[1] == 2:
+            bucketed_means = p[:-1,:].mean(axis = 0)
+            print(bucketed_means)
+            with torch.no_grad():
+                print(p)
+                p[:-1,:] -= (p[:-1,:] - bucketed_means) * 0.01
+                print(p)
+                return
+                
+
+    # print_king_bucketed_psts(model)
 
 def ctypes_shapes_test() -> bool:
     passed = True
@@ -944,6 +974,7 @@ def main():
     # overwrite_all_hashes()
     # run_all_tests()
     compare_hyperparameters()
+    # print_weight_decay()
     return 0
 
 if __name__ == "__main__":
