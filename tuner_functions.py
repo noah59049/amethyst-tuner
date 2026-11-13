@@ -496,7 +496,7 @@ def print_king_bucketed_psts(model: Tuner):
 
             for i, thing in enumerate(params[piece_type].weight.data.int()[idx:idx+64,:]):
                 print(f"{" " * 23 * (1 - i % 8)}S({thing[0]:{l}},{thing[1]:{l}}), ", end = "\n" * (i % 8 - 6))
-            print(" " * 19 + "{")
+            print(" " * 19 + "},")
         print(" " * 10 + "}},")
     print(" " * 8 + "}}; // hash=" + f"{model.get_hash()}")
 
