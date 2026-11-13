@@ -479,8 +479,26 @@ def get_model(
 ########################################################
 
 eval_t_name = "packed_eval_t"
+def get_material_weights(model : Tuner):
+    material_weights = []
+    params = model.embedding_layers
+    for piece_type in range(6):
+        raw_weights = params[piece_type].weight.data[:-1,:]
+        material_weights.append(
+            torch.round(raw_weights[:-1,:].mean(axis = 0)).flatten().int()
+        )
+    return material_weights
+
+def print_material_weights(model : Tuner):
+    w = get_material_weights(model)
+    strw = [f"S{int(e[0]), int(e[1])}" for e in w]
+    strw2 = "{" + ", ".join(strw) + "}"
+    line = f"constexpr {eval_t_name} material[6] = {strw2};"
+    print(line)
+
 def print_king_bucketed_psts(model: Tuner):
     params = model.embedding_layers
+    material_weights = get_material_weights(model)
     print(f"    constexpr std::array<std::array<std::array<{eval_t_name}, 64>, 6>, {NUM_KING_BUCKETS}> psts = " + "{{")
     for bucket in range(NUM_KING_BUCKETS):
         idx = bucket * 64
@@ -488,17 +506,22 @@ def print_king_bucketed_psts(model: Tuner):
         for piece_type in range(6):
             print(" " * 19 + "{")
 
+            # Get PSTs for just this bucket
+            raw_weights = params[piece_type].weight.data.int()[:-1,:]
+            pst_weights = raw_weights - material_weights[piece_type]
+            pst_weights_bucketed = pst_weights[idx:idx+64,:]
+
             # Determine how much whitespace we need
-            # TODO: Change this so it only considers this bucket
-            l1 = len(str(torch.min(params[piece_type].weight.data.int()).item()))
-            l2 = len(str(torch.max(params[piece_type].weight.data.int()).item()))
+            l1 = len(str(torch.min(pst_weights_bucketed).item()))
+            l2 = len(str(torch.max(pst_weights_bucketed).item()))
             l = max(l1, l2)
 
-            for i, thing in enumerate(params[piece_type].weight.data.int()[idx:idx+64,:]):
+            for i, thing in enumerate(pst_weights_bucketed):
                 print(f"{" " * 23 * (1 - i % 8)}S({thing[0]:{l}},{thing[1]:{l}}), ", end = "\n" * (i % 8 - 6))
             print(" " * 19 + "},")
         print(" " * 10 + "}},")
     print(" " * 8 + "}}; // hash=" + f"{model.get_hash()}")
+
 
 def print_continuous_weights(model: Tuner):
     # Step 1: Continuous weights
