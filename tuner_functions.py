@@ -894,46 +894,46 @@ def model_forward_walkthrough():
     # This function seems slightly overkill
 
 all_hyperparameters = {
-    "adam_standard": {
-        "optimizer": "adam",
+    "adamw_standard": {
+        "optimizer": "adamw",
     },
     "lr=1e-4": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "base_lr": 1e-4
     },
     "lr=1e-2": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "base_lr": 1e-2
     },
     "l2=0": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "l2_lambda":0
     },
     "l2=1e-1": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "l2_lambda":1e-1
     },
     "l2=1e-3": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "l2_lambda":1e-3
     },
     "l2=1e-4": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "l2_lambda":1e-4
     },
     "l2=1e-5": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "l2_lambda":1e-5
     },
     "l2=1e-6": {
-        "optimizer": "adam",
+        "optimizer": "adamw",
         "l2_lambda":1e-6
     },
     "sgd": {
         "optimizer": "sgd"
     }
 }
-sample_hyperparameters = {k:all_hyperparameters[k] for k in ["adam_standard", "l2=0", "l2=1e-1", "l2=1e-3", "l2=1e-4", "l2=1e-5", "l2=1e-6"]}
+sample_hyperparameters = {k:all_hyperparameters[k] for k in ["adamw_standard", "l2=0", "l2=1e-1", "l2=1e-3", "l2=1e-4", "l2=1e-5", "l2=1e-6"]}
 
 def compare_hyperparameters():
     run_datas : list[dict] = []
@@ -972,7 +972,7 @@ def main():
     # print_tensor_shapes()
     check_all_hashes()
     # overwrite_all_hashes()
-    # run_all_tests()
+    run_all_tests()
     compare_hyperparameters()
     # print_weight_decay()
     return 0
