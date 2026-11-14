@@ -41,6 +41,7 @@ libtuner.getResults.argtypes = [POINTER(c_float), c_int]
 libtuner.getPhases.argtypes = [POINTER(c_int), c_int]
 libtuner.getKingSquares.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getMobility.argtypes = [c_int, POINTER(c_int), c_int]
+libtuner.getPawnThreats.argtypes = [c_int, POINTER(c_int), c_int]
 libtuner.getPSTs.argtypes = [c_int, c_int, c_int, POINTER(c_int), c_int]
 
 @functools.cache
@@ -90,6 +91,13 @@ def get_mobility(side):
     libtuner.getMobility(c_int(side), mobility, c_int(FENS_TO_KEEP))
     mobility = np.ctypeslib.as_array(mobility, shape=(6 * FENS_TO_KEEP,))
     return mobility.reshape(-1,6)
+    # We will convert to torch tensor and to float when we stack all the tensors together
+
+def get_pawn_threats(side):
+    pawn_threats = (c_int * (6 * FENS_TO_KEEP))()
+    libtuner.getPawnThreats(c_int(side), pawn_threats, c_int(FENS_TO_KEEP))
+    pawn_threats = np.ctypeslib.as_array(pawn_threats, shape=(6 * FENS_TO_KEEP,))
+    return pawn_threats.reshape(-1,6)
     # We will convert to torch tensor and to float when we stack all the tensors together
 
 def get_psts(side, piece):
@@ -183,7 +191,12 @@ CONTINUOUS_FUNCTIONS = [
         "mobility",
         6,
         get_mobility
-    )
+    ),
+    ContinuousFeature(
+        "pawn_threats",
+        6,
+        get_pawn_threats
+    ),
 ]
 
 
