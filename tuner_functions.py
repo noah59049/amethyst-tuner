@@ -628,7 +628,7 @@ def get_ctypes_hashes():
         sha256torch(x) for x in get_embeddings("all")
     ] + \
     [
-        sha256torch(func(dataset_type)) for dataset_type in DATASET_TYPES for func in [get_results, get_phases, get_embeddings]
+        sha256torch(func(dataset_type)) for dataset_type in DATASET_TYPES for func in [get_results, get_phases, get_continuous_tensor]
     ]
     hashes_dict = {"hashes":hashes}
     return hashes_dict
