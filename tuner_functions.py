@@ -1004,7 +1004,7 @@ def main():
     check_all_hashes()
     # overwrite_all_hashes()
     run_all_tests()
-    compare_hyperparameters()
+    # compare_hyperparameters()
     # print_weight_decay()
     return 0
 
