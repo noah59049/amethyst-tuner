@@ -1003,6 +1003,16 @@ def compare_hyperparameters():
     for label, model in zip(labels, models):
         print(f"Model {label} has weight variance {model.get_weird_l2_norm().item():.4f}")
 
+def minirun_print_weights():
+    run_data = {}
+    model = get_model(max_epochs=6, optimizer = "lbfgs", verbose=True, l2_lambda = 1e-4, run_data=run_data)
+    print("\n" * 6)
+    print_material_weights(model)
+    print_continuous_weights(model)
+    print_king_bucketed_psts(model)
+    save_eval_to_file(model, "NoahResultsToy.txt")
+    return run_data
+
 def main():
     # model_forward_walkthrough()
     # print_huge_l2_run()
