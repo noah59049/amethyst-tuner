@@ -119,19 +119,14 @@ BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
                       0, 0, 0, 0, 1, 1, 1, 1,
                       0, 0, 0, 0, 1, 1, 1, 1]
 
-WHITE_KING_BUCKETS = BLACK_KING_BUCKETS.copy() # WHITE_KING_BUCKETS happen to be a copy of the black king buckets, but this is not necessarily true.
-
-NUM_KING_BUCKETS = 4
+NUM_KING_BUCKETS = 2
 
 def get_king_bucketed_psts(side, piece):
     psts = get_psts(side, piece)
-    friendly_king_squares = get_king_squares(side    ).reshape(-1)
-    enemy_king_squares    = get_king_squares(side ^ 1).reshape(-1)
+    king_squares = get_king_squares(side).reshape(-1)
     cap = torch.tensor(64 * NUM_KING_BUCKETS)
     
-    friendly_king_buckets = torch.tensor([BLACK_KING_BUCKETS[ksq ^ 56] for ksq in friendly_king_squares]).reshape(-1, 1)
-    enemy_king_buckets    = torch.tensor([WHITE_KING_BUCKETS[ksq     ] for ksq in enemy_king_squares   ]).reshape(-1, 1)
-    king_buckets = friendly_king_buckets + 2 * enemy_king_buckets
+    king_buckets = torch.tensor([BLACK_KING_BUCKETS[ksq ^ 56] for ksq in king_squares]).reshape(-1, 1)
     
     psts = torch.where(psts == 64, torch.tensor(10000), psts)
     psts += 64 * king_buckets
@@ -240,7 +235,7 @@ def initialize_tensors():
 #### Tuner class, defining the model ####
 #########################################
 
-EMBEDDING_DIMS = [256] * 6
+EMBEDDING_DIMS = [128] * 6
 # EMBEDDING_DIMS is how high the numbers in each embedding go
 # And how big to make the nn.Embedding corresponding to it
 # So if EMBEDDING_DIMS[0] is 64, a Tuner will have its first embedding layer be a nn.Embedding(65, 2, padding_idx = 64)
