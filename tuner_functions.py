@@ -110,14 +110,16 @@ def get_psts(side, piece):
 #### King bucketed PSTs ####
 ############################
 
-BLACK_KING_BUCKETS = [0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1,
-                      0, 0, 0, 0, 1, 1, 1, 1]
+BLACK_KING_BUCKETS = torch.tensor([
+0, 0, 0, 0, 1, 1, 1, 1,
+0, 0, 0, 0, 1, 1, 1, 1,
+0, 0, 0, 0, 1, 1, 1, 1,
+0, 0, 0, 0, 1, 1, 1, 1,
+0, 0, 0, 0, 1, 1, 1, 1,
+0, 0, 0, 0, 1, 1, 1, 1,
+0, 0, 0, 0, 1, 1, 1, 1,
+0, 0, 0, 0, 1, 1, 1, 1,
+])
 
 WHITE_KING_BUCKETS = BLACK_KING_BUCKETS.copy() # WHITE_KING_BUCKETS happen to be a copy of the black king buckets, but this is not necessarily true.
 
@@ -129,8 +131,8 @@ def get_king_bucketed_psts(side, piece):
     enemy_king_squares    = get_king_squares(side ^ 1).reshape(-1)
     cap = torch.tensor(64 * NUM_KING_BUCKETS)
     
-    friendly_king_buckets = torch.tensor([BLACK_KING_BUCKETS[ksq ^ 56] for ksq in friendly_king_squares]).reshape(-1, 1)
-    enemy_king_buckets    = torch.tensor([WHITE_KING_BUCKETS[ksq     ] for ksq in enemy_king_squares   ]).reshape(-1, 1)
+    friendly_king_buckets = torch.index_select(BLACK_KING_BUCKETS, 0, friendly_king_squares ^ 56).reshape(-1, 1)
+    enemy_king_buckets    = torch.index_select(WHITE_KING_BUCKETS, 0, enemy_king_squares        ).reshape(-1, 1)
     king_buckets = friendly_king_buckets + 2 * enemy_king_buckets
     
     psts = torch.where(psts == 64, torch.tensor(10000), psts)
